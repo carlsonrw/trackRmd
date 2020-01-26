@@ -1,0 +1,370 @@
+---
+title: Empathy Middle School Analyses with Pilot
+author: Erika Weisz
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r set wd and read data, include=FALSE}
+#Set working directory to the location of this .Rmd file (note: the dataset should be in the same folder)
+  setwd("~/Dropbox/middleSchoolManuscript/Current")
+  d0 = read.csv('empathyMiddleSchool_withPilot.csv')
+```
+
+```{r install packages, include=FALSE}
+#install packages
+library("knitr") 
+library("plyr")
+library("dplyr")
+library("ggplot2")
+library("gridExtra")
+library("grid")
+library("lattice")
+library("psych")
+library("lsr")
+library("effsize")
+library("weights")
+library("ggpubr")
+library("lavaan")
+```
+
+```{r knit functions, echo=FALSE}
+#formatting p-values for APA
+format_pval <- function(x){
+  if (x < .001) return(paste('<', '.001'))
+  if (x > .1) return(paste('=', rd(x, 2)))
+  paste('=', rd(x, 3))   # 3 = no. of digits to round p value to if p < .001 
+}
+##########################################
+```
+
+```{r changing levels for figure, include=FALSE}
+levels(d0$Group) 
+#default is Control, Malleable, Social Norms
+
+d0$Group <- factor(d0$Group, levels = c("CI","SNI","MMI"))
+#Levels now set to Control, Social Norms, Malleable Mindset for figure
+#CI = Control
+#MMI = Malleable Mindset
+#SNI = Social Norms
+```
+
+```{r setting school as a factor, include=FALSE}
+d0$School = as.factor(d0$School) #make sure it's not is numeric
+```
+
+
+#Normativity Beliefs
+```{r normativity beliefs, include=FALSE}
+#assessing scores on beliefs about the normativity of empathy questionnaire at follow up
+normativityAOV = aov(NormsTotal ~ Group, data=d0)
+summary(normativityAOV)
+etaSquared(normativityAOV)
+
+#comparisons 
+bartlett.test(NormsTotal~Group, data = d0) #don't assume equal variance
+
+#Social Norms and Control
+nb_SNI_CI_t = t.test(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="CI"],var.equal = FALSE)
+nb_SNI_CI_d = cohen.d(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
+
+#Social Norms and Malleable Mindset
+nb_SNI_MMI_t = t.test(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="MMI"],var.equal = FALSE)
+nb_SNI_MMI_d = cohen.d(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="MMI"],return.dm=TRUE, na.rm=TRUE)
+
+#Malleable Mindset and Control
+nb_MMI_CI_t = t.test(d0$NormsTotal[d0$Group=="MMI"],d0$NormsTotal[d0$Group=="CI"],var.equal = FALSE)
+nb_MMI_CI_d = cohen.d(d0$NormsTotal[d0$Group=="MMI"],d0$NormsTotal[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
+
+
+```
+(Ordered by appearance in manuscript)
+
+#####Social Norms and Control [nb_SNI_CI]  
+*t*(`r rd(nb_SNI_CI_t$par,2)`) = `r rd(nb_SNI_CI_t$stat,2)`, *p* `r format_pval(nb_SNI_CI_t$p.value)`, 95% CI [`r rd(nb_SNI_CI_t$conf.int[1],2)`, `r rd(nb_SNI_CI_t$conf.int[2],2)`], *d* = `r rd(nb_SNI_CI_d$est,2)`
+
+#####Social Norms and Malleable Mindset [nb_SNI_MMI]  
+*t*(`r rd(nb_SNI_MMI_t$par,2)`) = `r rd(nb_SNI_MMI_t$stat,2)`, *p* `r format_pval(nb_SNI_MMI_t$p.value)`, 95% CI [`r rd(nb_SNI_MMI_t$conf.int[1],2)`, `r rd(nb_SNI_MMI_t$conf.int[2],2)`], *d* = `r rd(nb_SNI_MMI_d$est,2)`
+
+#####Malleable Mindset and Control [nb_MMI_CI]  
+*t*(`r rd(nb_MMI_CI_t$par,2)`) = `r rd(nb_MMI_CI_t$stat,2)`, *p* `r format_pval(nb_MMI_CI_t$p.value)`, 95% CI [`r rd(nb_MMI_CI_t$conf.int[1],2)`, `r rd(nb_MMI_CI_t$conf.int[2],2)`], *d* = `r rd(nb_MMI_CI_d$est,2)`
+
+
+
+#Malleability Beliefs
+```{r malleability beliefs, include=FALSE}
+#assessing scores on beliefs about the malleability of empathy questionnaire at follow up
+malleabilityAOV = aov(MalTotal ~ Group, data=d0)
+summary(malleabilityAOV)
+etaSquared(malleabilityAOV)
+```
+
+
+#Physical Aggression
+```{r physical aggression, include=FALSE}
+#Comparing scores on self-reported physical aggression
+
+physAOV = aov(CSBSphys ~ Group, data=d0)
+summary(physAOV)
+etaSquared(physAOV)
+```
+
+#Relational Aggression
+```{r relational aggression, include=FALSE}
+#Comparing scores on self-reported relational aggression
+
+raggAOV = aov(CSBSrelat ~ Group, data=d0)
+summary(raggAOV)
+etaSquared(raggAOV)
+```
+
+#Stress
+```{r stress, include=FALSE}
+#Comparing scores on self-reported stress
+
+stressAOV = aov(PSSTotal ~ Group, data=d0)
+summary(stressAOV)
+etaSquared(stressAOV)
+```
+
+#Loneliness
+```{r loneliness, include=FALSE}
+#Comparing scores on self-reported loneliness
+
+lonelyAOV = aov(LonelyTotal ~ Group, data=d0)
+summary(lonelyAOV)
+etaSquared(lonelyAOV)
+```
+
+#Empathic Concern
+```{r empathic concern, include=FALSE}
+#Comparing scores on self-reported empathic concern
+
+ecAOV = aov(ECtotal ~ Group, data=d0)
+summary(ecAOV)
+etaSquared(ecAOV)
+```
+
+#Perspective Taking
+```{r perspective taking, include=FALSE}
+#Comparing scores on self-reported perspective taking
+
+ptAOV = aov(PTtotal ~ Group, data=d0)
+summary(ptAOV)
+etaSquared(ptAOV)
+```
+
+#Personal Distress
+```{r personal distress, include=FALSE}
+#Comparing scores on self-reported personal distress
+
+pdAOV = aov(PDtotal ~ Group, data=d0)
+summary(pdAOV)
+etaSquared(pdAOV)
+```
+
+#Peer-reported prosocial behavior
+```{r peer reported prosocial beahvior, include=FALSE}
+proNomsAOV = aov(prosocialNomsTotal ~ Group, data=d0)
+summary(proNomsAOV)
+etaSquared(proNomsAOV)
+```
+
+#CSBS Prosocial
+```{r self-reported prosocial behavior, include=FALSE}
+#Comparing scores on self-reported prosocial behavior
+
+selfProAOV = aov(CSBSprosocial ~ Group, data=d0)
+summary(selfProAOV)
+etaSquared(selfProAOV)
+```
+
+#Intervention Engagement, self
+```{r intervention engagement self, include=FALSE}
+#assessing self-reported engagement during three intervention sessions
+engageSelfAOV = aov(carefulYouSesAvg ~ Group, data=d0)
+summary(engageSelfAOV)
+etaSquared(engageSelfAOV)
+```
+
+#Intervention Engagement, peers
+```{r intervention engagement peers, include=FALSE}
+#assessing perceptions of peer engagement during three intervention sessions
+engagePeersAOV = aov(carefulPeersSesAvg ~ Group, data=d0)
+summary(engagePeersAOV)
+etaSquared(engagePeersAOV)
+```
+
+#Intervention Engagement, self by school
+```{r intervention engagement self by school, include=FALSE}
+#assessing self-reported engagement during three intervention sessions (looking across schools)
+engageSelfSchoolAOV = aov(carefulYouSesAvg ~ School, data=d0)
+summary(engageSelfSchoolAOV)
+etaSquared(engageSelfSchoolAOV)
+
+#comparisons 
+bartlett.test(carefulYouSesAvg~School, data = d0) #assume equal variance
+
+#1 and 2
+se_1_2_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="2"],var.equal = TRUE)
+se_1_2_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#1 and 3
+se_1_3_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="3"],var.equal = TRUE)
+se_1_3_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#1 and 4
+se_1_4_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = TRUE)
+se_1_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#1 and pilot
+se_1_pilot_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="pilot"],var.equal = TRUE)
+se_1_pilot_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="pilot"],return.dm=TRUE, na.rm=TRUE)
+
+#3 and 2
+se_3_2_t = t.test(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="2"],var.equal = TRUE)
+se_3_2_d = cohen.d(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#3 and 4
+se_3_4_t = t.test(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = TRUE)
+se_3_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#3 and pilot
+se_3_pilot_t = t.test(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="pilot"],var.equal = TRUE)
+se_3_pilot_d = cohen.d(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="pilot"],return.dm=TRUE, na.rm=TRUE)
+
+#pilot and 2
+se_pilot_2_t = t.test(d0$carefulYouSesAvg[d0$School=="pilot"],d0$carefulYouSesAvg[d0$School=="2"],var.equal = TRUE)
+se_pilot_2_d = cohen.d(d0$carefulYouSesAvg[d0$School=="pilot"],d0$carefulYouSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#pilot and 4
+se_pilot_4_t = t.test(d0$carefulYouSesAvg[d0$School=="pilot"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = TRUE)
+se_pilot_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="pilot"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#2 and 4
+se_2_4_t = t.test(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = TRUE)
+se_2_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+```
+(Ordered by appearance in manuscript)
+
+#####1 and 2 [se_1_2]  
+*t*(`r rd(se_1_2_t$par,2)`) = `r rd(se_1_2_t$stat,2)`, *p* `r format_pval(se_1_2_t$p.value)`, 95% CI [`r rd(se_1_2_t$conf.int[1],2)`, `r rd(se_1_2_t$conf.int[2],2)`], *d* = `r rd(se_1_2_d$est,2)`
+
+#####1 and 3 [se_1_3]  
+*t*(`r rd(se_1_3_t$par,2)`) = `r rd(se_1_3_t$stat,2)`, *p* `r format_pval(se_1_3_t$p.value)`, 95% CI [`r rd(se_1_3_t$conf.int[1],2)`, `r rd(se_1_3_t$conf.int[2],2)`], *d* = `r rd(se_1_3_d$est,2)`
+
+#####1 and 4 [se_1_4]  
+*t*(`r rd(se_1_4_t$par,2)`) = `r rd(se_1_4_t$stat,2)`, *p* `r format_pval(se_1_4_t$p.value)`, 95% CI [`r rd(se_1_4_t$conf.int[1],2)`, `r rd(se_1_4_t$conf.int[2],2)`], *d* = `r rd(se_1_4_d$est,2)`
+
+#####1 and pilot [se_1_pilot]  
+*t*(`r rd(se_1_pilot_t$par,2)`) = `r rd(se_1_pilot_t$stat,2)`, *p* `r format_pval(se_1_pilot_t$p.value)`, 95% CI [`r rd(se_1_pilot_t$conf.int[1],2)`, `r rd(se_1_pilot_t$conf.int[2],2)`], *d* = `r rd(se_1_pilot_d$est,2)`
+
+#####3 and 2 [se_3_2]  
+*t*(`r rd(se_3_2_t$par,2)`) = `r rd(se_3_2_t$stat,2)`, *p* `r format_pval(se_3_2_t$p.value)`, 95% CI [`r rd(se_3_2_t$conf.int[1],2)`, `r rd(se_3_2_t$conf.int[2],2)`], *d* = `r rd(se_3_2_d$est,2)`
+
+#####3 and 4 [se_3_4]  
+*t*(`r rd(se_3_4_t$par,2)`) = `r rd(se_3_4_t$stat,2)`, *p* `r format_pval(se_3_4_t$p.value)`, 95% CI [`r rd(se_3_4_t$conf.int[1],2)`, `r rd(se_3_4_t$conf.int[2],2)`], *d* = `r rd(se_3_4_d$est,2)`
+
+
+#####3 and pilot [se_3_pilot]  
+*t*(`r rd(se_3_pilot_t$par,2)`) = `r rd(se_3_pilot_t$stat,2)`, *p* `r format_pval(se_3_pilot_t$p.value)`, 95% CI [`r rd(se_3_pilot_t$conf.int[1],2)`, `r rd(se_3_pilot_t$conf.int[2],2)`], *d* = `r rd(se_3_pilot_d$est,2)`
+
+#####pilot and 2 [se_pilot_2]  
+*t*(`r rd(se_pilot_2_t$par,2)`) = `r rd(se_pilot_2_t$stat,2)`, *p* `r format_pval(se_pilot_2_t$p.value)`, 95% CI [`r rd(se_pilot_2_t$conf.int[1],2)`, `r rd(se_pilot_2_t$conf.int[2],2)`], *d* = `r rd(se_pilot_2_d$est,2)`
+
+#####pilot and 4 [se_pilot_4]  
+*t*(`r rd(se_pilot_4_t$par,2)`) = `r rd(se_pilot_4_t$stat,2)`, *p* `r format_pval(se_pilot_4_t$p.value)`, 95% CI [`r rd(se_pilot_4_t$conf.int[1],2)`, `r rd(se_pilot_4_t$conf.int[2],2)`], *d* = `r rd(se_pilot_4_d$est,2)`
+
+#####2 and 4 [se_2_4]  
+*t*(`r rd(se_2_4_t$par,2)`) = `r rd(se_2_4_t$stat,2)`, *p* `r format_pval(se_2_4_t$p.value)`, 95% CI [`r rd(se_2_4_t$conf.int[1],2)`, `r rd(se_2_4_t$conf.int[2],2)`], *d* = `r rd(se_2_4_d$est,2)`
+
+#Intervention Engagement, peers by school
+```{r intervention engagement peers by school, include=FALSE}
+#assessing perceptions of peer engagement during three intervention sessions (looking across schools)
+engagePeersSchoolAOV = aov(carefulPeersSesAvg ~ School, data=d0)
+summary(engagePeersSchoolAOV)
+etaSquared(engagePeersSchoolAOV)
+
+#comparisons 
+bartlett.test(carefulPeersSesAvg~School, data = d0) #can't assume equal variance
+
+
+#1 and 2
+pe_1_2_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="2"],var.equal = TRUE)
+pe_1_2_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#1 and 3
+pe_1_3_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="3"],var.equal = TRUE)
+pe_1_3_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#1 and 4
+pe_1_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = TRUE)
+pe_1_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#1 and pilot
+pe_1_pilot_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="pilot"],var.equal = TRUE)
+pe_1_pilot_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="pilot"],return.dm=TRUE, na.rm=TRUE)
+
+#3 and 2
+pe_3_2_t = t.test(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="2"],var.equal = TRUE)
+pe_3_2_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#3 and 4
+pe_3_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = TRUE)
+pe_3_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#3 and pilot
+pe_3_pilot_t = t.test(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="pilot"],var.equal = TRUE)
+pe_3_pilot_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="pilot"],return.dm=TRUE, na.rm=TRUE)
+
+#pilot and 2
+pe_pilot_2_t = t.test(d0$carefulPeersSesAvg[d0$School=="pilot"],d0$carefulPeersSesAvg[d0$School=="2"],var.equal = TRUE)
+pe_pilot_2_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="pilot"],d0$carefulPeersSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#pilot and 4
+pe_pilot_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="pilot"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = TRUE)
+pe_pilot_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="pilot"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#2 and 4
+pe_2_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = TRUE)
+pe_2_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+```
+(Ordered by appearance in manuscript)
+
+#####1 and 2 [pe_1_2]  
+*t*(`r rd(pe_1_2_t$par,2)`) = `r rd(pe_1_2_t$stat,2)`, *p* `r format_pval(pe_1_2_t$p.value)`, 95% CI [`r rd(pe_1_2_t$conf.int[1],2)`, `r rd(pe_1_2_t$conf.int[2],2)`], *d* = `r rd(pe_1_2_d$est,2)`
+
+#####1 and 3 [pe_1_3]  
+*t*(`r rd(pe_1_3_t$par,2)`) = `r rd(pe_1_3_t$stat,2)`, *p* `r format_pval(pe_1_3_t$p.value)`, 95% CI [`r rd(pe_1_3_t$conf.int[1],2)`, `r rd(pe_1_3_t$conf.int[2],2)`], *d* = `r rd(pe_1_3_d$est,2)`
+
+#####1 and 4 [pe_1_4]  
+*t*(`r rd(pe_1_4_t$par,2)`) = `r rd(pe_1_4_t$stat,2)`, *p* `r format_pval(pe_1_4_t$p.value)`, 95% CI [`r rd(pe_1_4_t$conf.int[1],2)`, `r rd(pe_1_4_t$conf.int[2],2)`], *d* = `r rd(pe_1_4_d$est,2)`
+
+#####1 and pilot [pe_1_pilot]  
+*t*(`r rd(pe_1_pilot_t$par,2)`) = `r rd(pe_1_pilot_t$stat,2)`, *p* `r format_pval(pe_1_pilot_t$p.value)`, 95% CI [`r rd(pe_1_pilot_t$conf.int[1],2)`, `r rd(pe_1_pilot_t$conf.int[2],2)`], *d* = `r rd(pe_1_pilot_d$est,2)`
+
+#####3 and 2 [pe_3_2]  
+*t*(`r rd(pe_3_2_t$par,2)`) = `r rd(pe_3_2_t$stat,2)`, *p* `r format_pval(pe_3_2_t$p.value)`, 95% CI [`r rd(pe_3_2_t$conf.int[1],2)`, `r rd(pe_3_2_t$conf.int[2],2)`], *d* = `r rd(pe_3_2_d$est,2)`
+
+#####3 and 4 [pe_3_4]  
+*t*(`r rd(pe_3_4_t$par,2)`) = `r rd(pe_3_4_t$stat,2)`, *p* `r format_pval(pe_3_4_t$p.value)`, 95% CI [`r rd(pe_3_4_t$conf.int[1],2)`, `r rd(pe_3_4_t$conf.int[2],2)`], *d* = `r rd(pe_3_4_d$est,2)`
+
+
+#####3 and pilot [pe_3_pilot]  
+*t*(`r rd(pe_3_pilot_t$par,2)`) = `r rd(pe_3_pilot_t$stat,2)`, *p* `r format_pval(pe_3_pilot_t$p.value)`, 95% CI [`r rd(pe_3_pilot_t$conf.int[1],2)`, `r rd(pe_3_pilot_t$conf.int[2],2)`], *d* = `r rd(pe_3_pilot_d$est,2)`
+
+#####pilot and 2 [pe_pilot_2]  
+*t*(`r rd(pe_pilot_2_t$par,2)`) = `r rd(pe_pilot_2_t$stat,2)`, *p* `r format_pval(pe_pilot_2_t$p.value)`, 95% CI [`r rd(pe_pilot_2_t$conf.int[1],2)`, `r rd(pe_pilot_2_t$conf.int[2],2)`], *d* = `r rd(pe_pilot_2_d$est,2)`
+
+#####pilot and 4 [pe_pilot_4]  
+*t*(`r rd(pe_pilot_4_t$par,2)`) = `r rd(pe_pilot_4_t$stat,2)`, *p* `r format_pval(pe_pilot_4_t$p.value)`, 95% CI [`r rd(pe_pilot_4_t$conf.int[1],2)`, `r rd(pe_pilot_4_t$conf.int[2],2)`], *d* = `r rd(pe_pilot_4_d$est,2)`
+
+#####2 and 4 [pe_2_4]  
+*t*(`r rd(pe_2_4_t$par,2)`) = `r rd(pe_2_4_t$stat,2)`, *p* `r format_pval(pe_2_4_t$p.value)`, 95% CI [`r rd(pe_2_4_t$conf.int[1],2)`, `r rd(pe_2_4_t$conf.int[2],2)`], *d* = `r rd(pe_2_4_d$est,2)`
+
+
+
+

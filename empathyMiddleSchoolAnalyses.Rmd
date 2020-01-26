@@ -1,0 +1,960 @@
+---
+title: Empathy Middle School Analyses
+author: Erika Weisz
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r set wd and read data, include=FALSE}
+#Set working directory to the location of this .Rmd file (note: the dataset should be in the same folder)
+  setwd("~/Dropbox/middleSchoolManuscript/Current")
+  d0 = read.csv('empathyMiddleSchool.csv')
+```
+
+```{r install packages, include=FALSE}
+#install packages
+library("knitr") 
+library("tidyverse")
+library("psych")
+library("lsr")
+library("effsize")
+library("weights")
+library("ggpubr")
+library("lavaan")
+```
+
+```{r knit functions, echo=FALSE}
+#formatting p-values for APA
+format_pval <- function(x){
+  if (x < .001) return(paste('<', '.001'))
+  if (x > .1) return(paste('=', rd(x, 2)))
+  paste('=', rd(x, 3))   # 3 = no. of digits to round p value to if p < .001 
+}
+##########################################
+```
+
+```{r changing levels for figure, include=FALSE}
+levels(d0$Group) 
+#default is Control, Malleable, Social Norms
+
+d0$Group <- factor(d0$Group, levels = c("CI","SNI","MMI"))
+#Levels now set to Control, Social Norms, Malleable Mindset for figure
+#CI = Control
+#MMI = Malleable Mindset
+#SNI = Social Norms
+```
+
+```{r setting school as a factor}
+#make sure school is not is numeric
+d0$School = as.factor(d0$School) 
+```
+
+
+#Normativity beliefs by group
+```{r normativity beliefs, include=FALSE}
+#assessing scores on beliefs about the normativity of empathy questionnaire at follow up 1
+normativityAOV = aov(NormsTotal ~ Group, data=d0)
+summary(normativityAOV)
+etaSquared(normativityAOV)
+
+#comparisons 
+bartlett.test(NormsTotal~Group, data = d0) #don't assume equal variance
+
+#Social Norms and Control
+nb_SNI_CI_t = t.test(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="CI"],var.equal = FALSE)
+nb_SNI_CI_d = cohen.d(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
+
+#Social Norms and Malleable Mindset
+nb_SNI_MMI_t = t.test(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="MMI"],var.equal = FALSE)
+nb_SNI_MMI_d = cohen.d(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="MMI"],return.dm=TRUE, na.rm=TRUE)
+
+#Malleable Mindset and Control
+nb_MMI_CI_t = t.test(d0$NormsTotal[d0$Group=="MMI"],d0$NormsTotal[d0$Group=="CI"],var.equal = FALSE)
+nb_MMI_CI_d = cohen.d(d0$NormsTotal[d0$Group=="MMI"],d0$NormsTotal[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
+
+
+```
+(Ordered by appearance in manuscript)
+
+#####Social Norms and Control Norms Beliefs [nb_SNI_CI]  
+*t*(`r rd(nb_SNI_CI_t$par,2)`) = `r rd(nb_SNI_CI_t$stat,2)`, *p* `r format_pval(nb_SNI_CI_t$p.value)`, 95% CI [`r rd(nb_SNI_CI_t$conf.int[1],2)`, `r rd(nb_SNI_CI_t$conf.int[2],2)`], *d* = `r rd(nb_SNI_CI_d$est,2)`
+
+#####Social Norms and Malleable Mindset Norms Beliefs [nb_SNI_MMI]  
+*t*(`r rd(nb_SNI_MMI_t$par,2)`) = `r rd(nb_SNI_MMI_t$stat,2)`, *p* `r format_pval(nb_SNI_MMI_t$p.value)`, 95% CI [`r rd(nb_SNI_MMI_t$conf.int[1],2)`, `r rd(nb_SNI_MMI_t$conf.int[2],2)`], *d* = `r rd(nb_SNI_MMI_d$est,2)`
+
+#####Malleable Mindset and Control Norms Beliefs [nb_MMI_CI]  
+*t*(`r rd(nb_MMI_CI_t$par,2)`) = `r rd(nb_MMI_CI_t$stat,2)`, *p* `r format_pval(nb_MMI_CI_t$p.value)`, 95% CI [`r rd(nb_MMI_CI_t$conf.int[1],2)`, `r rd(nb_MMI_CI_t$conf.int[2],2)`], *d* = `r rd(nb_MMI_CI_d$est,2)`
+
+
+#Malleability beliefs by group
+```{r malleability beliefs, include=FALSE}
+#assessing scores on beliefs about the malleability of empathy questionnaire at follow up 1
+malleabilityAOV = aov(MalTotal ~ Group, data=d0)
+summary(malleabilityAOV)
+etaSquared(malleabilityAOV)
+```
+
+#Empathic Motives by group
+```{r empathic motives, include=FALSE}
+#assessing composite scores on empathic motives questionnaire at the end of the third session 
+empMotivesAOV = aov(EmpMotivesComp ~ Group, data=d0)
+summary(empMotivesAOV)
+etaSquared(empMotivesAOV)
+
+#comparisons 
+bartlett.test(EmpMotivesComp~Group, data = d0) #assume equal variance
+
+#Social Norms and Control
+em_SNI_CI_t = t.test(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="CI"],var.equal = TRUE)
+em_SNI_CI_d = cohen.d(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
+
+#Social Norms and Malleable Mindset
+em_SNI_MMI_t = t.test(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="MMI"],var.equal = TRUE)
+em_SNI_MMI_d = cohen.d(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="MMI"],return.dm=TRUE, na.rm=TRUE)
+
+#Malleable Mindset and Control
+em_MMI_CI_t = t.test(d0$EmpMotivesComp[d0$Group=="MMI"],d0$EmpMotivesComp[d0$Group=="CI"],var.equal = TRUE)
+em_MMI_CI_d = cohen.d(d0$EmpMotivesComp[d0$Group=="MMI"],d0$EmpMotivesComp[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
+```
+(Ordered by appearance in manuscript)
+
+#####Social and Control Empathic Motivation [em_SNI_CI]  
+*t*(`r rd(em_SNI_CI_t$par,2)`) = `r rd(em_SNI_CI_t$stat,2)`, *p* `r format_pval(em_SNI_CI_t$p.value)`, 95% CI [`r rd(em_SNI_CI_t$conf.int[1],2)`, `r rd(em_SNI_CI_t$conf.int[2],2)`], *d* = `r rd(em_SNI_CI_d$est,2)`
+
+#####Social Norms and Malleable Mindset Empathic Motivation [em_SNI_MMI]  
+*t*(`r rd(em_SNI_MMI_t$par,2)`) = `r rd(em_SNI_MMI_t$stat,2)`, *p* `r format_pval(em_SNI_MMI_t$p.value)`, 95% CI [`r rd(em_SNI_MMI_t$conf.int[1],2)`, `r rd(em_SNI_MMI_t$conf.int[2],2)`], *d* = `r rd(em_SNI_MMI_d$est,2)`
+
+#####Malleable Mindset and Control Empathic Motivation [em_MMI_CI]  
+*t*(`r rd(em_MMI_CI_t$par,2)`) = `r rd(em_MMI_CI_t$stat,2)`, *p* `r format_pval(em_MMI_CI_t$p.value)`, 95% CI [`r rd(em_MMI_CI_t$conf.int[1],2)`, `r rd(em_MMI_CI_t$conf.int[2],2)`], *d* = `r rd(em_MMI_CI_d$est,2)`
+
+
+
+
+#Indirect effects of group assignment on peer-reported prosocial behavior
+```{r examining indirect effects of empathic motives and peer-reported prosocial behavior, warning=FALSE}
+d3 = subset(d0,School != 1) #exclude school 1 school, where there wasn't a difference in empathic motives or social normativty between conditions
+
+d3_SNI_CI = subset(d3,Group != "MMI") #remove malleable so as to compare social norms to control condition
+d3_SNI_CI$Group <- factor(d3_SNI_CI$Group, levels = c("CI","SNI")) 
+contrasts(d3_SNI_CI$Group)
+
+x = d3_SNI_CI$Group
+y = d3_SNI_CI$prosocialNomsTotal
+m = d3_SNI_CI$EmpMotivesComp
+DataProNoms <- data.frame(X = x, Y = y, M = m)
+
+model_simplemed <-  '# direct effect
+                     Y ~ c*X
+                     # mediator
+                     M ~ a*X
+                     Y ~ b*M
+                     # indirect effect (a*b)
+                     ab := a*b
+                     # total effect
+                     total := c + (a*b)
+                     '
+         
+fit <- sem(model_simplemed, data = DataProNoms)
+summary(fit)
+
+set.seed(1234)
+
+#for boot strapped 95% CIs
+fit <- sem(model_simplemed, data=DataProNoms, se="bootstrap", bootstrap = 10000)
+summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
+
+boot.fit <- parameterEstimates(fit)
+boot.fit
+```
+
+
+
+#Indirect effects of group assignment on loneliness
+```{r examining indirect effects of empathic motives and loneliness, warning=FALSE}
+d3 = subset(d0,School != 1) #exclude school 1 school, where there wasn't a difference in empathic motives or social normativty between conditions
+
+d3_SNI_CI = subset(d3,Group != "MMI") #remove malleable so as to compare social norms to control condition
+d3_SNI_CI$Group <- factor(d3_SNI_CI$Group, levels = c("CI","SNI")) 
+contrasts(d3_SNI_CI$Group)
+
+x = d3_SNI_CI$Group
+y = d3_SNI_CI$LonelyTotal
+m = d3_SNI_CI$EmpMotivesComp
+
+DataLonely <- data.frame(X = x, Y = y, M = m)
+
+model_simplemed <-  '# direct effect
+                     Y ~ c*X
+                     # mediator
+                     M ~ a*X
+                     Y ~ b*M
+                     # indirect effect (a*b)
+                     ab := a*b
+                     # total effect
+                     total := c + (a*b)
+                     '
+set.seed(1234)
+         
+fit <- sem(model_simplemed, data = DataLonely)
+summary(fit)
+
+
+#for boot strapped 95% CIs
+fit <- sem(model_simplemed, data=DataLonely, se="bootstrap", bootstrap = 10000)
+summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
+
+boot.fit <- parameterEstimates(fit)
+boot.fit
+```
+
+
+#Indirect effects of group assignment on physical aggression
+```{r examining indirect effects of empathic motives and physical aggression,  warning=FALSE}
+d3 = subset(d0,School != 1) #exclude school 1 school, where there wasn't a difference in empathic motives or social normativty between conditions
+
+d3_SNI_CI = subset(d3,Group != "MMI") #remove malleable so as to compare social norms to control condition
+d3_SNI_CI$Group <- factor(d3_SNI_CI$Group, levels = c("CI","SNI")) 
+contrasts(d3_SNI_CI$Group)
+
+x = d3_SNI_CI$Group
+y = d3_SNI_CI$CSBSphys
+m = d3_SNI_CI$EmpMotivesComp
+
+DataPhys <- data.frame(X = x, Y = y, M = m)
+
+model_simplemed <-  '# direct effect
+                     Y ~ c*X
+                     # mediator
+                     M ~ a*X
+                     Y ~ b*M
+                     # indirect effect (a*b)
+                     ab := a*b
+                     # total effect
+                     total := c + (a*b)
+                     '
+set.seed(1234)         
+
+fit <- sem(model_simplemed, data = DataPhys)
+summary(fit)
+
+
+#for boot strapped 95% CIs
+fit <- sem(model_simplemed, data=DataPhys, se="bootstrap", bootstrap = 10000)
+summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
+
+boot.fit <- parameterEstimates(fit)
+boot.fit
+```
+
+
+#Indirect effects of group assignment on relational aggression
+```{r examining indirect effects of empathic motives and relational aggression,  warning=FALSE}
+d3 = subset(d0,School != 1) #exclude school 1 school, where there wasn't a difference in empathic motives or social normativty between conditions
+
+d3_SNI_CI = subset(d3,Group != "MMI") #remove malleable so as to compare social norms to control condition
+d3_SNI_CI$Group <- factor(d3_SNI_CI$Group, levels = c("CI","SNI")) 
+contrasts(d3_SNI_CI$Group)
+
+x = d3_SNI_CI$Group
+y = d3_SNI_CI$CSBSrelat
+m = d3_SNI_CI$EmpMotivesComp
+
+DataRelat <- data.frame(X = x, Y = y, M = m)
+
+model_simplemed <-  '# direct effect
+                     Y ~ c*X
+                     # mediator
+                     M ~ a*X
+                     Y ~ b*M
+                     # indirect effect (a*b)
+                     ab := a*b
+                     # total effect
+                     total := c + (a*b)
+                     '
+set.seed(1234)         
+
+fit <- sem(model_simplemed, data = DataRelat)
+summary(fit)
+
+
+#for boot strapped 95% CIs
+fit <- sem(model_simplemed, data=DataRelat, se="bootstrap", bootstrap = 10000)
+summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
+
+boot.fit <- parameterEstimates(fit)
+boot.fit
+```
+
+
+#Physical aggression by group
+```{r physical aggression, include=FALSE}
+#Comparing scores on self-reported physical aggression
+
+physAOV = aov(CSBSphys ~ Group, data=d0)
+summary(physAOV)
+etaSquared(physAOV)
+```
+
+#Relational aggression by group
+```{r relational aggression, include=FALSE}
+#Comparing scores on self-reported relational aggression
+
+raggAOV = aov(CSBSrelat ~ Group, data=d0)
+summary(raggAOV)
+etaSquared(raggAOV)
+```
+
+#Self-reported prosocial behavior by group
+```{r self-reported prosocial behavior, include=FALSE}
+#Comparing scores on self-reported prosocial behavior
+
+selfProAOV = aov(CSBSprosocial ~ Group, data=d0)
+summary(selfProAOV)
+etaSquared(selfProAOV)
+```
+
+#Peer-reported prosocial behavior by group
+```{r peer reported prosocial beahvior}
+proNomsAOV = aov(prosocialNomsTotal ~ Group, data=d0)
+summary(proNomsAOV)
+etaSquared(proNomsAOV)
+```
+
+#Empathic concern by group
+```{r empathic concern, include=FALSE}
+#Comparing scores on self-reported empathic concern
+
+ecAOV = aov(ECtotal ~ Group, data=d0)
+summary(ecAOV)
+etaSquared(ecAOV)
+```
+
+#Perspective taking by group
+```{r perspective taking, include=FALSE}
+#Comparing scores on self-reported perspective taking
+
+ptAOV = aov(PTtotal ~ Group, data=d0)
+summary(ptAOV)
+etaSquared(ptAOV)
+```
+
+#Stress
+```{r stress, include=FALSE}
+#Comparing scores on self-reported stress
+
+stressAOV = aov(PSSTotal ~ Group, data=d0)
+summary(stressAOV)
+etaSquared(stressAOV)
+```
+
+#Loneliness
+```{r loneliness, include=FALSE}
+#Comparing scores on self-reported loneliness
+
+lonelyAOV = aov(LonelyTotal ~ Group, data=d0)
+summary(lonelyAOV)
+etaSquared(lonelyAOV)
+```
+
+#Personal Distress
+```{r personal distress, include=FALSE}
+#Comparing scores on self-reported personal distress
+
+pdAOV = aov(PDtotal ~ Group, data=d0)
+summary(pdAOV)
+etaSquared(pdAOV)
+```
+
+
+#Intervention self engagement by school
+```{r intervention engagement self by school, include=FALSE}
+#assessing self-reported engagement during three intervention sessions (looking across schools)
+engageSelfSchoolAOV = aov(carefulYouSesAvg ~ School, data=d0)
+summary(engageSelfSchoolAOV)
+etaSquared(engageSelfSchoolAOV)
+
+#comparisons 
+bartlett.test(carefulYouSesAvg~School, data = d0) #assume equal variance
+
+#School 1 and 2
+se_1_2_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="2"],var.equal = FALSE)
+se_1_2_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 3
+se_1_3_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="3"],var.equal = FALSE)
+se_1_3_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 4
+se_1_4_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = FALSE)
+se_1_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#School 2 and 3
+se_2_3_t = t.test(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="3"],var.equal = FALSE)
+se_2_3_d = cohen.d(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 2 and 4
+se_2_4_t = t.test(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = FALSE)
+se_2_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#School 3 and 4
+se_3_4_t = t.test(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = FALSE)
+se_3_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+```
+#####Schools 2 and 4 self engagement [se_2_4]  
+*t*(`r rd(se_2_4_t$par,2)`) = `r rd(se_2_4_t$stat,2)`, *p* `r format_pval(se_2_4_t$p.value)`, 95% CI [`r rd(se_2_4_t$conf.int[1],2)`, `r rd(se_2_4_t$conf.int[2],2)`], *d* = `r rd(se_2_4_d$est,2)`
+
+
+#Intervention peer engagement by school
+```{r intervention engagement peers by school, include=FALSE}
+#assessing perceptions of peer engagement during three intervention sessions (looking across schools)
+engagePeersSchoolAOV = aov(carefulPeersSesAvg ~ School, data=d0)
+summary(engagePeersSchoolAOV)
+etaSquared(engagePeersSchoolAOV)
+
+#comparisons 
+bartlett.test(carefulPeersSesAvg~School, data = d0) #can't assume equal variance
+
+
+#School 1 and 2
+pe_1_2_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="2"],var.equal = FALSE)
+pe_1_2_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 3
+pe_1_3_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="3"],var.equal = FALSE)
+pe_1_3_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 4
+pe_1_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = FALSE)
+pe_1_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#School 2 and 3
+pe_2_3_t = t.test(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="3"],var.equal = FALSE)
+pe_2_3_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 2 and 4
+pe_2_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = FALSE)
+pe_2_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#School 3 and 4
+pe_3_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = FALSE)
+pe_3_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+```
+#####Schools 2 and 4 [pe_2_4]  
+*t*(`r rd(pe_2_4_t$par,2)`) = `r rd(pe_2_4_t$stat,2)`, *p* `r format_pval(pe_2_4_t$p.value)`, 95% CI [`r rd(pe_2_4_t$conf.int[1],2)`, `r rd(pe_2_4_t$conf.int[2],2)`], *d* = `r rd(pe_2_4_d$est,2)`
+
+
+
+#Physical Agggression by school
+```{r physical aggression by school, include=FALSE}
+physSchoolAOV = aov(CSBSphys ~ School, data=d0)
+summary(physSchoolAOV)
+etaSquared(physSchoolAOV)
+
+#comparisons 
+bartlett.test(CSBSphys~School, data = d0) #can't assume equal variance
+
+
+#School 1 and 2
+pa_1_2_t = t.test(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="2"],var.equal = FALSE)
+pa_1_2_d = cohen.d(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 3
+pa_1_3_t = t.test(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="3"],var.equal = FALSE)
+pa_1_3_d = cohen.d(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 4
+pa_1_4_t = t.test(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="4"],var.equal = FALSE)
+pa_1_4_d = cohen.d(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#School 2 and 3
+pa_2_3_t = t.test(d0$CSBSphys[d0$School=="2"],d0$CSBSphys[d0$School=="3"],var.equal = FALSE)
+pa_2_3_d = cohen.d(d0$CSBSphys[d0$School=="2"],d0$CSBSphys[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 4 and 2
+pa_4_2_t = t.test(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="2"],var.equal = FALSE)
+pa_4_2_d = cohen.d(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#School 4 and 3
+pa_4_3_t = t.test(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="3"],var.equal = FALSE)
+pa_4_3_d = cohen.d(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+```
+#####Schools 1 and 2 [pa_1_2]  
+*t*(`r rd(pa_1_2_t$par,2)`) = `r rd(pa_1_2_t$stat,2)`, *p* `r format_pval(pa_1_2_t$p.value)`, 95% CI [`r rd(pa_1_2_t$conf.int[1],2)`, `r rd(pa_1_2_t$conf.int[2],2)`], *d* = `r rd(pa_1_2_d$est,2)`
+
+#####Schools 1 and 3 [pa_1_3]  
+*t*(`r rd(pa_1_3_t$par,2)`) = `r rd(pa_1_3_t$stat,2)`, *p* `r format_pval(pa_1_3_t$p.value)`, 95% CI [`r rd(pa_1_3_t$conf.int[1],2)`, `r rd(pa_1_3_t$conf.int[2],2)`], *d* = `r rd(pa_1_3_d$est,2)`
+
+#####Schools 1 and 4 [pa_1_4]  
+*t*(`r rd(pa_1_4_t$par,2)`) = `r rd(pa_1_4_t$stat,2)`, *p* `r format_pval(pa_1_4_t$p.value)`, 95% CI [`r rd(pa_1_4_t$conf.int[1],2)`, `r rd(pa_1_4_t$conf.int[2],2)`], *d* = `r rd(pa_1_4_d$est,2)`
+
+#####Schools 4 and 2 [pa_4_2]  
+*t*(`r rd(pa_4_2_t$par,2)`) = `r rd(pa_4_2_t$stat,2)`, *p* `r format_pval(pa_4_2_t$p.value)`, 95% CI [`r rd(pa_4_2_t$conf.int[1],2)`, `r rd(pa_4_2_t$conf.int[2],2)`], *d* = `r rd(pa_4_2_d$est,2)`
+
+#####Schools 4 and 3 [pa_4_3]  
+*t*(`r rd(pa_4_3_t$par,2)`) = `r rd(pa_4_3_t$stat,2)`, *p* `r format_pval(pa_4_3_t$p.value)`, 95% CI [`r rd(pa_4_3_t$conf.int[1],2)`, `r rd(pa_4_3_t$conf.int[2],2)`], *d* = `r rd(pa_4_3_d$est,2)`
+
+
+#Relational Agggression by school
+```{r relational aggression by school, include=FALSE}
+relatSchoolAOV = aov(CSBSrelat ~ School, data=d0)
+summary(relatSchoolAOV)
+etaSquared(relatSchoolAOV)
+
+#comparisons 
+bartlett.test(CSBSrelat~School, data = d0) #can't assume equal variance
+
+
+#School 1 and 2
+ra_1_2_t = t.test(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="2"],var.equal = FALSE)
+ra_1_2_d = cohen.d(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 3
+ra_1_3_t = t.test(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="3"],var.equal = FALSE)
+ra_1_3_d = cohen.d(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 4
+ra_1_4_t = t.test(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="4"],var.equal = FALSE)
+ra_1_4_d = cohen.d(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#School 2 and 3
+ra_2_3_t = t.test(d0$CSBSrelat[d0$School=="2"],d0$CSBSrelat[d0$School=="3"],var.equal = FALSE)
+ra_2_3_d = cohen.d(d0$CSBSrelat[d0$School=="2"],d0$CSBSrelat[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 4 and 2
+ra_4_2_t = t.test(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="2"],var.equal = FALSE)
+ra_4_2_d = cohen.d(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#School 4 and 3
+ra_4_3_t = t.test(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="3"],var.equal = FALSE)
+ra_4_3_d = cohen.d(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+```
+#####Schools 1 and 2 [ra_1_2]  
+*t*(`r rd(ra_1_2_t$par,2)`) = `r rd(ra_1_2_t$stat,2)`, *p* `r format_pval(ra_1_2_t$p.value)`, 95% CI [`r rd(ra_1_2_t$conf.int[1],2)`, `r rd(ra_1_2_t$conf.int[2],2)`], *d* = `r rd(ra_1_2_d$est,2)`
+
+#####Schools 1 and 3 [ra_1_3]  
+*t*(`r rd(ra_1_3_t$par,2)`) = `r rd(ra_1_3_t$stat,2)`, *p* `r format_pval(ra_1_3_t$p.value)`, 95% CI [`r rd(ra_1_3_t$conf.int[1],2)`, `r rd(ra_1_3_t$conf.int[2],2)`], *d* = `r rd(ra_1_3_d$est,2)`
+
+#####Schools 1 and 4 [ra_1_4]  
+*t*(`r rd(ra_1_4_t$par,2)`) = `r rd(ra_1_4_t$stat,2)`, *p* `r format_pval(ra_1_4_t$p.value)`, 95% CI [`r rd(ra_1_4_t$conf.int[1],2)`, `r rd(ra_1_4_t$conf.int[2],2)`], *d* = `r rd(ra_1_4_d$est,2)`
+
+#####Schools 4 and 2 [ra_4_2]  
+*t*(`r rd(ra_4_2_t$par,2)`) = `r rd(ra_4_2_t$stat,2)`, *p* `r format_pval(ra_4_2_t$p.value)`, 95% CI [`r rd(ra_4_2_t$conf.int[1],2)`, `r rd(ra_4_2_t$conf.int[2],2)`], *d* = `r rd(ra_4_2_d$est,2)`
+
+#####Schools 4 and 2 [ra_4_2]  
+*t*(`r rd(ra_4_3_t$par,2)`) = `r rd(ra_4_3_t$stat,2)`, *p* `r format_pval(ra_4_3_t$p.value)`, 95% CI [`r rd(ra_4_3_t$conf.int[1],2)`, `r rd(ra_4_3_t$conf.int[2],2)`], *d* = `r rd(ra_4_3_d$est,2)`
+
+
+
+
+
+
+#Self-reported prosocial behavior by school
+```{r prosocial behavior by school, include=FALSE}
+
+prosocialSchoolAOV = aov(CSBSprosocial ~ School, data=d0)
+summary(prosocialSchoolAOV)
+etaSquared(prosocialSchoolAOV)
+
+#comparisons 
+bartlett.test(CSBSprosocial~School, data = d0) #can't assume equal variance
+
+
+#School 1 and 2
+pro_1_2_t = t.test(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="2"],var.equal = FALSE)
+pro_1_2_d = cohen.d(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 3
+pro_1_3_t = t.test(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="3"],var.equal = FALSE)
+pro_1_3_d = cohen.d(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 4
+pro_1_4_t = t.test(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="4"],var.equal = FALSE)
+pro_1_4_d = cohen.d(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#School 2 and 3
+pro_2_3_t = t.test(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="3"],var.equal = FALSE)
+pro_2_3_d = cohen.d(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 2 and 4
+pro_2_4_t = t.test(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="4"],var.equal = FALSE)
+pro_2_4_d = cohen.d(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#School 3 and 4
+pro_3_4_t = t.test(d0$CSBSprosocial[d0$School=="3"],d0$CSBSprosocial[d0$School=="4"],var.equal = FALSE)
+pro_3_4_d = cohen.d(d0$CSBSprosocial[d0$School=="3"],d0$CSBSprosocial[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+```
+
+#####Schools 1 and 3 [pro_1_3]  
+*t*(`r rd(pro_1_3_t$par,2)`) = `r rd(pro_1_3_t$stat,2)`, *p* `r format_pval(pro_1_3_t$p.value)`, 95% CI [`r rd(pro_1_3_t$conf.int[1],2)`, `r rd(pro_1_3_t$conf.int[2],2)`], *d* = `r rd(pro_1_3_d$est,2)`
+
+#####Schools 1 and 4 [pro_1_4]  
+*t*(`r rd(pro_1_4_t$par,2)`) = `r rd(pro_1_4_t$stat,2)`, *p* `r format_pval(pro_1_4_t$p.value)`, 95% CI [`r rd(pro_1_4_t$conf.int[1],2)`, `r rd(pro_1_4_t$conf.int[2],2)`], *d* = `r rd(pro_1_4_d$est,2)`
+
+#####Schools 2 and 3 [pro_2_3]  
+*t*(`r rd(pro_2_3_t$par,2)`) = `r rd(pro_2_3_t$stat,2)`, *p* `r format_pval(pro_2_3_t$p.value)`, 95% CI [`r rd(pro_2_3_t$conf.int[1],2)`, `r rd(pro_2_3_t$conf.int[2],2)`], *d* = `r rd(pro_2_3_d$est,2)`
+
+#####Schools 1 and 2 [pro_1_2]  
+*t*(`r rd(pro_1_2_t$par,2)`) = `r rd(pro_1_2_t$stat,2)`, *p* `r format_pval(pro_1_2_t$p.value)`, 95% CI [`r rd(pro_1_2_t$conf.int[1],2)`, `r rd(pro_1_2_t$conf.int[2],2)`], *d* = `r rd(pro_1_2_d$est,2)`
+
+#####Schools 2 and 4 [pro_2_4]  
+*t*(`r rd(pro_2_4_t$par,2)`) = `r rd(pro_2_4_t$stat,2)`, *p* `r format_pval(pro_2_4_t$p.value)`, 95% CI [`r rd(pro_2_4_t$conf.int[1],2)`, `r rd(pro_2_4_t$conf.int[2],2)`], *d* = `r rd(pro_2_4_d$est,2)`
+
+#####Schools 3 and 4 [pro_3_4]  
+*t*(`r rd(pro_3_4_t$par,2)`) = `r rd(pro_3_4_t$stat,2)`, *p* `r format_pval(pro_3_4_t$p.value)`, 95% CI [`r rd(pro_3_4_t$conf.int[1],2)`, `r rd(pro_3_4_t$conf.int[2],2)`], *d* = `r rd(pro_3_4_d$est,2)`
+
+
+
+
+
+#Creating Figure 1 (empathic motivation)
+
+```{Make figure 1, include=FALSE}
+cbPalette = c("#512857","#4254AE", "#1DA29B") #color palette 
+
+#Empathic Motives
+EmpMotives_agg = d0 %>%
+  group_by(Group) %>%
+  summarise(mean=mean(EmpMotivesComp, na.rm = T), sd=sd(EmpMotivesComp,na.rm=T), n = sum(!is.na(EmpMotivesComp)), se = sd/sqrt(n))
+
+empMotives = ggplot(EmpMotives_agg, aes(x=Group, y=mean, fill = Group)) + #bar graph
+ geom_bar(position=position_dodge(), stat="identity",
+          colour="black", # Use black outlines,
+          size=.3) +
+scale_fill_manual(values=cbPalette, 
+                   name = "Condition",
+                   labels = c("Control", "Social Norms", "Malleable"))+ geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+               colour="black",
+               size=.4,
+               width=.2,                    # Width of the error bars
+               position=position_dodge(.9)) +
+ xlab("Group") +
+ ylab("Composite Score Total") +
+ ggtitle("Empathic Motivation") +
+ theme(legend.position="none") +
+ scale_x_discrete(labels=c("Control","Norms","Mindset")) +
+ scale_y_continuous(limits=c(0,65),breaks=1:65*2) +         # Specifying y scale and points
+ theme(plot.title = element_text(hjust = 0.5)) + 
+coord_cartesian(ylim=c(34,42)) 
+
+
+ggsave("~/Dropbox/middleSchoolManuscript/Current/Fig1.jpg", width = 3.5, height = 3,dpi = 300)
+```
+
+
+
+#Creating Figure 2 (Engagement scores by school)
+```{r Making figure 2, include=FALSE}
+engageSelf_School = d0 %>%
+  group_by(School) %>%
+  summarise(mean=mean(carefulYouSesAvg, na.rm = T), sd=sd(carefulYouSesAvg,na.rm=T), n = sum(!is.na(carefulYouSesAvg)), se = sd/sqrt(n))
+
+engageSelf_plot = ggplot(engageSelf_School,
+         aes(x=School, y=mean, fill = School)) + #bar graph
+ geom_bar(position=position_dodge(), stat="identity",
+          colour="black", # Use black outlines,
+          size=.3) +
+ geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+               colour="black",
+               size=.4,
+               width=.2,                    # Width of the error bars
+               position=position_dodge(.9)) +
+ ggtitle("Self-Reported \nIntervention Engagement") +
+ scale_y_continuous(limits=c(0,5),breaks=0:25*.2) +        
+ theme(plot.title = element_text(hjust = 0.5)) +
+ ylab("Composite Self-Reported \nEngagement Score") +
+ coord_cartesian(ylim=c(2.75,4)) +
+ theme(axis.title.x=element_blank()) +
+ scale_x_discrete(labels=c("School \n 1","School \n 2","School \n 3","School \n 4")) +
+ theme(legend.position="none") 
+
+engagePeers_School = d0 %>%
+  group_by(School) %>%
+  summarise(mean=mean(carefulPeersSesAvg, na.rm = T), sd=sd(carefulPeersSesAvg,na.rm=T), n = sum(!is.na(carefulPeersSesAvg)), se = sd/sqrt(n))
+
+engagePeers_plot = ggplot(engagePeers_School,
+         aes(x=School, y=mean, fill = School)) + #bar graph
+ geom_bar(position=position_dodge(), stat="identity",
+          colour="black", # Use black outlines,
+          size=.3) +
+ geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+               colour="black",
+               size=.4,
+               width=.2,                    # Width of the error bars
+               position=position_dodge(.9)) +
+ ggtitle("Perceptions of Peer \nIntervention Engagement") +
+ scale_y_continuous(limits=c(0,5),breaks=0:25*.3) +        
+ theme(plot.title = element_text(hjust = 0.5)) +
+ ylab("Composite Peer \nEngagement Score") +
+ coord_cartesian(ylim=c(3.,4.6)) +
+ theme(axis.title.x=element_blank()) +
+ scale_x_discrete(labels=c("School \n 1","School \n 2","School \n 3","School \n 4")) +
+ theme(legend.position="none") 
+ 
+ggarrange(engageSelf_plot, engagePeers_plot, labels = c("A)","B)"), ncol = 2)
+ggsave("~/Dropbox/middleSchoolManuscript/Current/Fig2.jpg", width = 6.5, height = 3, dpi = 300)
+```
+
+
+
+#Creating figure 3, physical and relational aggression by school
+```{r Making figure 3, include=FALSE}
+phys_School = d0 %>%
+  group_by(School) %>%
+  summarise(mean=mean(CSBSphys, na.rm = T), sd=sd(CSBSphys,na.rm=T), n = sum(!is.na(CSBSphys)), se = sd/sqrt(n))
+
+phys_Plot = ggplot(phys_School,
+         aes(x=School, y=mean, fill = School)) + #bar graph
+ geom_bar(position=position_dodge(), stat="identity",
+          colour="black", # Use black outlines,
+          size=.3) +
+ geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+               colour="black",
+               size=.4,
+               width=.2,                    # Width of the error bars
+               position=position_dodge(.9)) +
+ ggtitle("Self-Reported \nPhysical Aggression") +
+ scale_y_continuous(limits=c(0,10),breaks=0:25*.5) +        
+ theme(plot.title = element_text(hjust = 0.5)) +
+ ylab("Subscale Score") +
+ coord_cartesian(ylim=c(2.5, 4)) +
+ theme(axis.title.x=element_blank()) +
+ scale_x_discrete(labels=c("School \n 1","School \n 2","School \n 3","School \n 4")) +
+ theme(legend.position="none") 
+
+
+
+realt_School = d0 %>%
+  group_by(School) %>%
+  summarise(mean=mean(CSBSrelat, na.rm = T), sd=sd(CSBSrelat,na.rm=T), n = sum(!is.na(CSBSrelat)), se = sd/sqrt(n))
+
+relat_Plot = ggplot(realt_School,
+         aes(x=School, y=mean, fill = School)) + #bar graph
+ geom_bar(position=position_dodge(), stat="identity",
+          colour="black", # Use black outlines,
+          size=.3) +
+ geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+               colour="black",
+               size=.4,
+               width=.2,                    # Width of the error bars
+               position=position_dodge(.9)) +
+ ggtitle("Self-Reported \nRelational Aggression") +
+ scale_y_continuous(limits=c(0,10),breaks=0:25*.5) +        
+ theme(plot.title = element_text(hjust = 0.5)) +
+ ylab("Subscale Score") +
+ coord_cartesian(ylim=c(7, 10)) +
+ theme(axis.title.x=element_blank()) +
+ scale_x_discrete(labels=c("School \n 1","School \n 2","School \n 3","School \n 4")) +
+ theme(legend.position="none") 
+
+ggarrange(phys_Plot, relat_Plot, labels = c("A)","B)"), ncol = 2)
+ggsave("~/Dropbox/middleSchoolManuscript/Current/Fig3.jpg", width = 6.5, height = 3, dpi = 300)
+```
+
+#Creating Figure 4 (Empathic motives and normativity beliefs by school and group)
+```{r Making figure 4, include=FALSE}
+cbPalette = c("#512857","#4254AE", "#1DA29B") #color palette 
+
+Empathic_Motives_School_Group = d0 %>%
+  group_by(Group,School) %>%
+  summarise(mean=mean(EmpMotivesComp, na.rm = T), sd=sd(EmpMotivesComp,na.rm=T), n = sum(!is.na(EmpMotivesComp)), se = sd/sqrt(n))
+
+motivesPlot = ggplot(Empathic_Motives_School_Group,
+         aes(x=School, y=mean, fill = Group)) + #bar graph
+ geom_bar(position=position_dodge(), stat="identity",
+          colour="black", # Use black outlines,
+          size=.3) +
+ scale_fill_manual(values=cbPalette, 
+                   name = "Condition",
+                   labels = c("Control", "Malleable","Social Norms"))+
+ geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+               colour="black",
+               size=.4,
+               width=.2,                    # Width of the error bars
+               position=position_dodge(.9)) +
+ ggtitle("Empathic Motives") +
+ scale_y_continuous(limits=c(0,65),breaks=1:65*2) +         # Specifying y scale and points
+ #theme_bw(base_size = 16) +
+ theme(plot.title = element_text(hjust = 0.5))  +
+ ylab("Motives Scale Score") + 
+ coord_cartesian(ylim=c(34,44)) +
+ theme(axis.title.x=element_blank()) +
+ scale_x_discrete(labels=c("School \n 1","School \n 2","School \n 3","School \n 4")) +
+ theme(legend.position="none")
+
+
+Normativity_School_Group = d0 %>%
+  group_by(Group,School) %>%
+  summarise(mean=mean(NormsTotal, na.rm = T), sd=sd(NormsTotal,na.rm=T), n = sum(!is.na(NormsTotal)), se = sd/sqrt(n))
+
+
+normsPlot = ggplot(Normativity_School_Group, aes(x=School, y=mean, fill = Group)) + #bar graph
+ geom_bar(position=position_dodge(), stat="identity",
+          colour="black", # Use black outlines,
+          size=.3) +
+ scale_fill_manual(values=cbPalette, 
+                   name = "Condition",
+                   labels = c("Control", "Malleable","Social Norms"))+
+ geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+               colour="black",
+               size=.4,
+               width=.2,                    # Width of the error bars
+               position=position_dodge(.9)) +
+ ggtitle("Normativity Beliefs") +
+ scale_y_continuous(limits=c(0,35),breaks=1:63*2) +        
+ theme(plot.title = element_text(hjust = 0.5)) +
+ ylab("Normativity Scale Score") +
+ coord_cartesian(ylim=c(24,32)) +
+ theme(axis.title.x=element_blank()) +
+ scale_x_discrete(labels=c("School \n 1","School \n 2","School \n 3","School \n 4")) +
+ theme(legend.position="none") 
+
+ggarrange(motivesPlot, normsPlot, labels = c("A)","B)"), ncol = 2)
+ggsave("~/Dropbox/middleSchoolManuscript/Current/Fig4.jpg", width = 6.5, height = 3, dpi = 300)
+```
+
+
+#SUPPLEMENT: Skepticism about empathy
+```{r supplement skepticism about empathy for , include=FALSE}
+empNotGoodSchoolAOV = aov(empNotGood ~ School, data=d0)
+summary(empNotGoodSchoolAOV)
+etaSquared(empNotGoodSchoolAOV)
+
+
+#comparisons 
+bartlett.test(empNotGood~School, data = d0) #can't assume equal variance
+
+
+#School 1 and 2
+t.test(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="2"],var.equal = FALSE)
+cohen.d(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 3
+t.test(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="3"],var.equal = FALSE)
+cohen.d(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 1 and 4
+t.test(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="4"],var.equal = FALSE)
+cohen.d(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+#School 2 and 3
+t.test(d0$empNotGood[d0$School=="2"],d0$empNotGood[d0$School=="3"],var.equal = FALSE)
+cohen.d(d0$empNotGood[d0$School=="2"],d0$empNotGood[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+
+#School 3 and 4
+t.test(d0$empNotGood[d0$School=="3"],d0$empNotGood[d0$School=="4"],var.equal = FALSE)
+cohen.d(d0$empNotGood[d0$School=="3"],d0$empNotGood[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+empNotGood_School = d0 %>%
+  group_by(School) %>%
+  summarise(mean=mean(empNotGood, na.rm = T), sd=sd(empNotGood,na.rm=T), n = sum(!is.na(empNotGood)), se = sd/sqrt(n))
+
+empNotGood_School_plot = ggplot(empNotGood_School,
+         aes(x=School, y=mean, fill = School)) + #bar graph
+ geom_bar(position=position_dodge(), stat="identity",
+          colour="black", # Use black outlines,
+          size=.3) +
+ geom_errorbar(aes(ymin=mean-se, ymax=mean+se),
+               colour="black",
+               size=.4,
+               width=.2,                    # Width of the error bars
+               position=position_dodge(.9)) +
+ ggtitle("Skepticism about \nEmpathy") +
+ scale_y_continuous(limits=c(0,5),breaks=0:25*.3) +        
+ theme(plot.title = element_text(hjust = 0.5)) +
+ ylab("Question Score") +
+ coord_cartesian(ylim=c(2,3.8)) +
+ theme(axis.title.x=element_blank()) +
+ scale_x_discrete(labels=c("School \n 1","School \n 2","School \n 3","School \n 4")) +
+ theme(legend.position="none") 
+
+
+#Missing data tables for supplement
+addmargins(table(d0$Group[which(is.na(d0$EmpMotivesComp))])) #Empathic motives
+addmargins(table(d0$Group[which(is.na(d0$CSBSrelat))])) #Relational aggression
+addmargins(table(d0$Group[which(is.na(d0$CSBSpro))])) #Self-reported prosocial behavior
+addmargins(table(d0$Group[which(is.na(d0$CSBSphys))])) #Physical aggression
+addmargins(table(d0$Group[which(is.na(d0$ECtotal))])) #IRI empathic concern
+addmargins(table(d0$Group[which(is.na(d0$PDtotal))])) #IRI personal distress
+addmargins(table(d0$Group[which(is.na(d0$PTtotal))])) #IRI perspective taking
+addmargins(table(d0$Group[which(is.na(d0$LonelyTotal))])) #Loneliness
+addmargins(table(d0$Group[which(is.na(d0$PSSTotal))])) #Stress
+addmargins(table(d0$Group[which(is.na(d0$MalTotal))])) #Malleability beliefs
+addmargins(table(d0$Group[which(is.na(d0$NormsTotal))])) #Norms beliefs
+```
+
+#SUPPLEMENT: SNI vs MMI and CI
+
+```{r coding for SNI vs other two conditions, supplemental analysis}
+d0$normsIntervention = NA
+d0$normsIntervention[d0$Group == c("SNI")] = 1
+d0$normsIntervention[d0$Group == c("MMI")] = 0
+d0$normsIntervention[d0$Group == c("CI")] = 0
+
+d3 = subset(d0,School != 1) 
+
+x = d3$normsIntervention
+y = d3$prosocialNomsTotal
+m = d3$EmpMotivesComp
+
+DataProNoms_SNI_v_MMI_CI <- data.frame(X = x, Y = y, M = m)
+
+model_simplemed <-  '# direct effect
+                     Y ~ c*X
+                     # mediator
+                     M ~ a*X
+                     Y ~ b*M
+                     # indirect effect (a*b)
+                     ab := a*b
+                     # total effect
+                     total := c + (a*b)
+                     '
+         
+fit <- sem(model_simplemed, data = DataProNoms_SNI_v_MMI_CI)
+summary(fit)
+
+
+set.seed(1234)
+
+#for boot strapped 95% CIs
+fit <- sem(model_simplemed, data=DataProNoms_SNI_v_MMI_CI, se="bootstrap", bootstrap = 10000)
+summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
+
+boot.fit <- parameterEstimates(fit)
+boot.fit
+```
+
+#SUPPLEMENT: Indirect effect with all four schools
+
+```{r including all four schools in SEM, supplemental analysis}
+d0_SNI_CI = subset(d0,Group != "MMI") #remove malleable so as to compare social norms to control condition
+d0_SNI_CI$Group <- factor(d0_SNI_CI$Group, levels = c("CI","SNI")) 
+contrasts(d0_SNI_CI$Group)
+
+x = d0_SNI_CI$Group
+y = d0_SNI_CI$prosocialNomsTotal
+m = d0_SNI_CI$EmpMotivesComp
+
+DataProNoms_all <- data.frame(X = x, Y = y, M = m)
+
+model_simplemed <-  '# direct effect
+                     Y ~ c*X
+                     # mediator
+                     M ~ a*X
+                     Y ~ b*M
+                     # indirect effect (a*b)
+                     ab := a*b
+                     # total effect
+                     total := c + (a*b)
+                     '
+         
+fit <- sem(model_simplemed, data = DataProNoms_all)
+summary(fit)
+
+#for boot strapped 95% CIs
+fit <- sem(model_simplemed, data=DataProNoms_SNI_v_MMI_CI, se="bootstrap", bootstrap = 10000)
+summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
+
+boot.fit <- parameterEstimates(fit)
+boot.fit
+```
