@@ -10,6 +10,7 @@ editor_options:
 #Set working directory to the location of this .Rmd file (note: the dataset should be in the same folder)
   setwd("~/Dropbox/middleSchoolManuscript/Current")
   d0 = read.csv('empathyMiddleSchool.csv')
+  
 ```
 
 ```{r install packages, include=FALSE}
@@ -55,89 +56,93 @@ d0$School = as.factor(d0$School)
 ```{r normativity beliefs, include=FALSE}
 #assessing scores on beliefs about the normativity of empathy questionnaire at follow up 1
 normativityAOV = aov(NormsTotal ~ Group, data=d0)
-summary(normativityAOV)
-etaSquared(normativityAOV)
+  nbG_aov = summary(normativityAOV)
+  nbG_eta = etaSquared(normativityAOV)
 
 #comparisons 
 bartlett.test(NormsTotal~Group, data = d0) #don't assume equal variance
 
 #Social Norms and Control
-nb_SNI_CI_t = t.test(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="CI"],var.equal = FALSE)
-nb_SNI_CI_d = cohen.d(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
+nbG_SNI_CI_t = t.test(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="CI"],var.equal = FALSE)
+nbG_SNI_CI_d = cohen.d(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
 
 #Social Norms and Malleable Mindset
-nb_SNI_MMI_t = t.test(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="MMI"],var.equal = FALSE)
-nb_SNI_MMI_d = cohen.d(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="MMI"],return.dm=TRUE, na.rm=TRUE)
+nbG_SNI_MMI_t = t.test(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="MMI"],var.equal = FALSE)
+nbG_SNI_MMI_d = cohen.d(d0$NormsTotal[d0$Group=="SNI"],d0$NormsTotal[d0$Group=="MMI"],return.dm=TRUE, na.rm=TRUE)
 
 #Malleable Mindset and Control
-nb_MMI_CI_t = t.test(d0$NormsTotal[d0$Group=="MMI"],d0$NormsTotal[d0$Group=="CI"],var.equal = FALSE)
-nb_MMI_CI_d = cohen.d(d0$NormsTotal[d0$Group=="MMI"],d0$NormsTotal[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
-
+nbG_MMI_CI_t = t.test(d0$NormsTotal[d0$Group=="MMI"],d0$NormsTotal[d0$Group=="CI"],var.equal = FALSE)
+nbG_MMI_CI_d = cohen.d(d0$NormsTotal[d0$Group=="MMI"],d0$NormsTotal[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
 
 ```
-(Ordered by appearance in manuscript)
+(Ordered by appearance in manuscript)  
 
-#####Social Norms and Control Norms Beliefs [nb_SNI_CI]  
-*t*(`r rd(nb_SNI_CI_t$par,2)`) = `r rd(nb_SNI_CI_t$stat,2)`, *p* `r format_pval(nb_SNI_CI_t$p.value)`, 95% CI [`r rd(nb_SNI_CI_t$conf.int[1],2)`, `r rd(nb_SNI_CI_t$conf.int[2],2)`], *d* = `r rd(nb_SNI_CI_d$est,2)`
+#####Normativity beliefs by group [nbG]
+*F*(`r nbG_aov[[1]][["Df"]][1]`, `r nbG_aov[[1]][["Df"]][2]`) = `r rd(nbG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(nbG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(nbG_eta[1],3)`
 
-#####Social Norms and Malleable Mindset Norms Beliefs [nb_SNI_MMI]  
-*t*(`r rd(nb_SNI_MMI_t$par,2)`) = `r rd(nb_SNI_MMI_t$stat,2)`, *p* `r format_pval(nb_SNI_MMI_t$p.value)`, 95% CI [`r rd(nb_SNI_MMI_t$conf.int[1],2)`, `r rd(nb_SNI_MMI_t$conf.int[2],2)`], *d* = `r rd(nb_SNI_MMI_d$est,2)`
+#####Social Norms and Control Norms Beliefs [nbG_SNI_CI]  
+*t*(`r rd(nbG_SNI_CI_t$par,2)`) = `r rd(nbG_SNI_CI_t$stat,2)`, *p* `r format_pval(nbG_SNI_CI_t$p.value)`, 95% CI [`r rd(nbG_SNI_CI_t$conf.int[1],2)`, `r rd(nbG_SNI_CI_t$conf.int[2],2)`], *d* = `r rd(nbG_SNI_CI_d$est,2)`
 
-#####Malleable Mindset and Control Norms Beliefs [nb_MMI_CI]  
-*t*(`r rd(nb_MMI_CI_t$par,2)`) = `r rd(nb_MMI_CI_t$stat,2)`, *p* `r format_pval(nb_MMI_CI_t$p.value)`, 95% CI [`r rd(nb_MMI_CI_t$conf.int[1],2)`, `r rd(nb_MMI_CI_t$conf.int[2],2)`], *d* = `r rd(nb_MMI_CI_d$est,2)`
+#####Social Norms and Malleable Mindset Norms Beliefs [nbG_SNI_MMI]  
+*t*(`r rd(nbG_SNI_MMI_t$par,2)`) = `r rd(nbG_SNI_MMI_t$stat,2)`, *p* `r format_pval(nbG_SNI_MMI_t$p.value)`, 95% CI [`r rd(nbG_SNI_MMI_t$conf.int[1],2)`, `r rd(nbG_SNI_MMI_t$conf.int[2],2)`], *d* = `r rd(nbG_SNI_MMI_d$est,2)`
+
+#####Malleable Mindset and Control Norms Beliefs [nbG_MMI_CI]  
+*t*(`r rd(nbG_MMI_CI_t$par,2)`) = `r rd(nbG_MMI_CI_t$stat,2)`, *p* `r format_pval(nbG_MMI_CI_t$p.value)`, 95% CI [`r rd(nbG_MMI_CI_t$conf.int[1],2)`, `r rd(nbG_MMI_CI_t$conf.int[2],2)`], *d* = `r rd(nbG_MMI_CI_d$est,2)`
 
 
 #Malleability beliefs by group
 ```{r malleability beliefs, include=FALSE}
 #assessing scores on beliefs about the malleability of empathy questionnaire at follow up 1
 malleabilityAOV = aov(MalTotal ~ Group, data=d0)
-summary(malleabilityAOV)
-etaSquared(malleabilityAOV)
+  mbG_aov = summary(malleabilityAOV)
+  mbG_eta = etaSquared(malleabilityAOV)
 ```
+#####Malleability beliefs by group [mbG] 
+*F*(`r mbG_aov[[1]][["Df"]][1]`, `r mbG_aov[[1]][["Df"]][2]`) = `r rd(mbG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(mbG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(mbG_eta[1],3)`
+
 
 #Empathic Motives by group
 ```{r empathic motives, include=FALSE}
 #assessing composite scores on empathic motives questionnaire at the end of the third session 
 empMotivesAOV = aov(EmpMotivesComp ~ Group, data=d0)
-summary(empMotivesAOV)
-etaSquared(empMotivesAOV)
+  emG_aov = summary(empMotivesAOV)
+  emG_eta = etaSquared(empMotivesAOV)
 
 #comparisons 
 bartlett.test(EmpMotivesComp~Group, data = d0) #assume equal variance
 
 #Social Norms and Control
-em_SNI_CI_t = t.test(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="CI"],var.equal = TRUE)
-em_SNI_CI_d = cohen.d(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
+emG_SNI_CI_t = t.test(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="CI"],var.equal = TRUE)
+emG_SNI_CI_d = cohen.d(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
 
 #Social Norms and Malleable Mindset
-em_SNI_MMI_t = t.test(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="MMI"],var.equal = TRUE)
-em_SNI_MMI_d = cohen.d(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="MMI"],return.dm=TRUE, na.rm=TRUE)
+emG_SNI_MMI_t = t.test(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="MMI"],var.equal = TRUE)
+emG_SNI_MMI_d = cohen.d(d0$EmpMotivesComp[d0$Group=="SNI"],d0$EmpMotivesComp[d0$Group=="MMI"],return.dm=TRUE, na.rm=TRUE)
 
 #Malleable Mindset and Control
-em_MMI_CI_t = t.test(d0$EmpMotivesComp[d0$Group=="MMI"],d0$EmpMotivesComp[d0$Group=="CI"],var.equal = TRUE)
-em_MMI_CI_d = cohen.d(d0$EmpMotivesComp[d0$Group=="MMI"],d0$EmpMotivesComp[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
+emG_MMI_CI_t = t.test(d0$EmpMotivesComp[d0$Group=="MMI"],d0$EmpMotivesComp[d0$Group=="CI"],var.equal = TRUE)
+emG_MMI_CI_d = cohen.d(d0$EmpMotivesComp[d0$Group=="MMI"],d0$EmpMotivesComp[d0$Group=="CI"],return.dm=TRUE, na.rm=TRUE)
 ```
-(Ordered by appearance in manuscript)
+#####Empathic Motives by group [emG] 
+*F*(`r emG_aov[[1]][["Df"]][1]`, `r emG_aov[[1]][["Df"]][2]`) = `r rd(emG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(emG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(emG_eta[1],3)`
 
-#####Social and Control Empathic Motivation [em_SNI_CI]  
-*t*(`r rd(em_SNI_CI_t$par,2)`) = `r rd(em_SNI_CI_t$stat,2)`, *p* `r format_pval(em_SNI_CI_t$p.value)`, 95% CI [`r rd(em_SNI_CI_t$conf.int[1],2)`, `r rd(em_SNI_CI_t$conf.int[2],2)`], *d* = `r rd(em_SNI_CI_d$est,2)`
+#####Social and Control Empathic Motivation [emG_SNI_CI]  
+*t*(`r rd(emG_SNI_CI_t$par,2)`) = `r rd(emG_SNI_CI_t$stat,2)`, *p* `r format_pval(emG_SNI_CI_t$p.value)`, 95% CI [`r rd(emG_SNI_CI_t$conf.int[1],2)`, `r rd(emG_SNI_CI_t$conf.int[2],2)`], *d* = `r rd(emG_SNI_CI_d$est,2)`
 
-#####Social Norms and Malleable Mindset Empathic Motivation [em_SNI_MMI]  
-*t*(`r rd(em_SNI_MMI_t$par,2)`) = `r rd(em_SNI_MMI_t$stat,2)`, *p* `r format_pval(em_SNI_MMI_t$p.value)`, 95% CI [`r rd(em_SNI_MMI_t$conf.int[1],2)`, `r rd(em_SNI_MMI_t$conf.int[2],2)`], *d* = `r rd(em_SNI_MMI_d$est,2)`
+#####Social Norms and Malleable Mindset Empathic Motivation [emG_SNI_MMI]  
+*t*(`r rd(emG_SNI_MMI_t$par,2)`) = `r rd(emG_SNI_MMI_t$stat,2)`, *p* `r format_pval(emG_SNI_MMI_t$p.value)`, 95% CI [`r rd(emG_SNI_MMI_t$conf.int[1],2)`, `r rd(emG_SNI_MMI_t$conf.int[2],2)`], *d* = `r rd(emG_SNI_MMI_d$est,2)`
 
-#####Malleable Mindset and Control Empathic Motivation [em_MMI_CI]  
-*t*(`r rd(em_MMI_CI_t$par,2)`) = `r rd(em_MMI_CI_t$stat,2)`, *p* `r format_pval(em_MMI_CI_t$p.value)`, 95% CI [`r rd(em_MMI_CI_t$conf.int[1],2)`, `r rd(em_MMI_CI_t$conf.int[2],2)`], *d* = `r rd(em_MMI_CI_d$est,2)`
-
-
+#####Malleable Mindset and Control Empathic Motivation [emG_MMI_CI]  
+*t*(`r rd(emG_MMI_CI_t$par,2)`) = `r rd(emG_MMI_CI_t$stat,2)`, *p* `r format_pval(emG_MMI_CI_t$p.value)`, 95% CI [`r rd(emG_MMI_CI_t$conf.int[1],2)`, `r rd(emG_MMI_CI_t$conf.int[2],2)`], *d* = `r rd(emG_MMI_CI_d$est,2)`
 
 
-#Indirect effects of group assignment on peer-reported prosocial behavior
-```{r examining indirect effects of empathic motives and peer-reported prosocial behavior, warning=FALSE}
+#Indirect effects of group assignment on peer-reported prosocial behavior 
+```{r examining indirect effects of empathic motives and peer-reported prosocial behavior, warning=FALSE, eval = FALSE, echo = FALSE}
 d3 = subset(d0,School != 1) #exclude school 1 school, where there wasn't a difference in empathic motives or social normativty between conditions
 
 d3_SNI_CI = subset(d3,Group != "MMI") #remove malleable so as to compare social norms to control condition
 d3_SNI_CI$Group <- factor(d3_SNI_CI$Group, levels = c("CI","SNI")) 
-contrasts(d3_SNI_CI$Group)
+  contrasts(d3_SNI_CI$Group)
 
 x = d3_SNI_CI$Group
 y = d3_SNI_CI$prosocialNomsTotal
@@ -156,27 +161,26 @@ model_simplemed <-  '# direct effect
                      '
          
 fit <- sem(model_simplemed, data = DataProNoms)
-summary(fit)
+  summary(fit)
 
 set.seed(1234)
 
 #for boot strapped 95% CIs
 fit <- sem(model_simplemed, data=DataProNoms, se="bootstrap", bootstrap = 10000)
-summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
-
+  summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
+  
 boot.fit <- parameterEstimates(fit)
-boot.fit
+  boot.fit
 ```
 
 
-
 #Indirect effects of group assignment on loneliness
-```{r examining indirect effects of empathic motives and loneliness, warning=FALSE}
+```{r examining indirect effects of empathic motives and loneliness, warning=FALSE, eval = FALSE, echo = FALSE}
 d3 = subset(d0,School != 1) #exclude school 1 school, where there wasn't a difference in empathic motives or social normativty between conditions
 
 d3_SNI_CI = subset(d3,Group != "MMI") #remove malleable so as to compare social norms to control condition
 d3_SNI_CI$Group <- factor(d3_SNI_CI$Group, levels = c("CI","SNI")) 
-contrasts(d3_SNI_CI$Group)
+  contrasts(d3_SNI_CI$Group)
 
 x = d3_SNI_CI$Group
 y = d3_SNI_CI$LonelyTotal
@@ -197,25 +201,25 @@ model_simplemed <-  '# direct effect
 set.seed(1234)
          
 fit <- sem(model_simplemed, data = DataLonely)
-summary(fit)
+  summary(fit)
 
 
 #for boot strapped 95% CIs
 fit <- sem(model_simplemed, data=DataLonely, se="bootstrap", bootstrap = 10000)
-summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
+  summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
 
 boot.fit <- parameterEstimates(fit)
-boot.fit
+  boot.fit
 ```
 
 
 #Indirect effects of group assignment on physical aggression
-```{r examining indirect effects of empathic motives and physical aggression,  warning=FALSE}
+```{r examining indirect effects of empathic motives and physical aggression,  warning=FALSE, eval = FALSE, echo = FALSE}
 d3 = subset(d0,School != 1) #exclude school 1 school, where there wasn't a difference in empathic motives or social normativty between conditions
 
 d3_SNI_CI = subset(d3,Group != "MMI") #remove malleable so as to compare social norms to control condition
 d3_SNI_CI$Group <- factor(d3_SNI_CI$Group, levels = c("CI","SNI")) 
-contrasts(d3_SNI_CI$Group)
+  contrasts(d3_SNI_CI$Group)
 
 x = d3_SNI_CI$Group
 y = d3_SNI_CI$CSBSphys
@@ -236,25 +240,25 @@ model_simplemed <-  '# direct effect
 set.seed(1234)         
 
 fit <- sem(model_simplemed, data = DataPhys)
-summary(fit)
+  summary(fit)
 
 
 #for boot strapped 95% CIs
 fit <- sem(model_simplemed, data=DataPhys, se="bootstrap", bootstrap = 10000)
-summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
+  summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
 
 boot.fit <- parameterEstimates(fit)
-boot.fit
+  boot.fit
 ```
 
 
 #Indirect effects of group assignment on relational aggression
-```{r examining indirect effects of empathic motives and relational aggression,  warning=FALSE}
+```{r examining indirect effects of empathic motives and relational aggression,  warning=FALSE, eval = FALSE, echo = FALSE}
 d3 = subset(d0,School != 1) #exclude school 1 school, where there wasn't a difference in empathic motives or social normativty between conditions
 
 d3_SNI_CI = subset(d3,Group != "MMI") #remove malleable so as to compare social norms to control condition
 d3_SNI_CI$Group <- factor(d3_SNI_CI$Group, levels = c("CI","SNI")) 
-contrasts(d3_SNI_CI$Group)
+  contrasts(d3_SNI_CI$Group)
 
 x = d3_SNI_CI$Group
 y = d3_SNI_CI$CSBSrelat
@@ -275,15 +279,15 @@ model_simplemed <-  '# direct effect
 set.seed(1234)         
 
 fit <- sem(model_simplemed, data = DataRelat)
-summary(fit)
+  summary(fit)
 
 
 #for boot strapped 95% CIs
 fit <- sem(model_simplemed, data=DataRelat, se="bootstrap", bootstrap = 10000)
-summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
+  summary(fit, fit.measures=TRUE, standardize=TRUE, rsquare=TRUE)
 
 boot.fit <- parameterEstimates(fit)
-boot.fit
+  boot.fit
 ```
 
 
@@ -292,324 +296,358 @@ boot.fit
 #Comparing scores on self-reported physical aggression
 
 physAOV = aov(CSBSphys ~ Group, data=d0)
-summary(physAOV)
-etaSquared(physAOV)
+  paG_aov = summary(physAOV)
+  paG_eta = etaSquared(physAOV)
 ```
+#####Physical aggression by group [paG] 
+*F*(`r paG_aov[[1]][["Df"]][1]`, `r paG_aov[[1]][["Df"]][2]`) = `r rd(paG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(paG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(paG_eta[1],3)`
+
 
 #Relational aggression by group
 ```{r relational aggression, include=FALSE}
 #Comparing scores on self-reported relational aggression
 
 raggAOV = aov(CSBSrelat ~ Group, data=d0)
-summary(raggAOV)
-etaSquared(raggAOV)
+  raG_aov = summary(raggAOV)
+  raG_eta = etaSquared(raggAOV)
 ```
+#####Relational aggression by group [raG] 
+*F*(`r raG_aov[[1]][["Df"]][1]`, `r raG_aov[[1]][["Df"]][2]`) = `r rd(raG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(raG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(raG_eta[1],3)`
+
 
 #Self-reported prosocial behavior by group
 ```{r self-reported prosocial behavior, include=FALSE}
 #Comparing scores on self-reported prosocial behavior
 
 selfProAOV = aov(CSBSprosocial ~ Group, data=d0)
-summary(selfProAOV)
-etaSquared(selfProAOV)
+  spG_aov = summary(selfProAOV)
+  spG_eta = etaSquared(selfProAOV)
 ```
+#####Self-reported prosocial behavior by group [spG] 
+*F*(`r spG_aov[[1]][["Df"]][1]`, `r spG_aov[[1]][["Df"]][2]`) = `r rd(spG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(spG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(spG_eta[1],3)`
+
 
 #Peer-reported prosocial behavior by group
-```{r peer reported prosocial beahvior}
+```{r peer reported prosocial behavior, include=FALSE}
 proNomsAOV = aov(prosocialNomsTotal ~ Group, data=d0)
-summary(proNomsAOV)
-etaSquared(proNomsAOV)
+  ppG_aov = summary(proNomsAOV)
+  ppG_eta = etaSquared(proNomsAOV)
 ```
+#####Peer-reported prosocial behavior by group [ppG] 
+*F*(`r ppG_aov[[1]][["Df"]][1]`, `r ppG_aov[[1]][["Df"]][2]`) = `r rd(ppG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(ppG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(ppG_eta[1],3)`
+
 
 #Empathic concern by group
 ```{r empathic concern, include=FALSE}
 #Comparing scores on self-reported empathic concern
 
 ecAOV = aov(ECtotal ~ Group, data=d0)
-summary(ecAOV)
-etaSquared(ecAOV)
+  ecG_aov = summary(ecAOV)
+  ecG_eta = etaSquared(ecAOV)
 ```
+#####Empathic concern by group [ecG] 
+*F*(`r ecG_aov[[1]][["Df"]][1]`, `r ecG_aov[[1]][["Df"]][2]`) = `r rd(ecG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(ecG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(ecG_eta[1],3)`
+
 
 #Perspective taking by group
 ```{r perspective taking, include=FALSE}
 #Comparing scores on self-reported perspective taking
 
 ptAOV = aov(PTtotal ~ Group, data=d0)
-summary(ptAOV)
-etaSquared(ptAOV)
+  ptG_aov = summary(ptAOV)
+  ptG_eta = etaSquared(ptAOV)
 ```
+#####Perspective taking by group [ptG] 
+*F*(`r ptG_aov[[1]][["Df"]][1]`, `r ptG_aov[[1]][["Df"]][2]`) = `r rd(ptG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(ptG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(ptG_eta[1],3)`
 
-#Stress
+
+#Stress by group
 ```{r stress, include=FALSE}
 #Comparing scores on self-reported stress
 
 stressAOV = aov(PSSTotal ~ Group, data=d0)
-summary(stressAOV)
-etaSquared(stressAOV)
+  sG_aov = summary(stressAOV)
+  sG_eta = etaSquared(stressAOV)
 ```
+#####Stress by group [sG] 
+*F*(`r sG_aov[[1]][["Df"]][1]`, `r sG_aov[[1]][["Df"]][2]`) = `r rd(sG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(sG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(sG_eta[1],3)`
 
-#Loneliness
+
+#Loneliness by group
 ```{r loneliness, include=FALSE}
 #Comparing scores on self-reported loneliness
 
 lonelyAOV = aov(LonelyTotal ~ Group, data=d0)
-summary(lonelyAOV)
-etaSquared(lonelyAOV)
+  lG_aov = summary(lonelyAOV)
+  lG_eta = etaSquared(lonelyAOV)
 ```
+#####Loneliness by group [l] 
+*F*(`r lG_aov[[1]][["Df"]][1]`, `r lG_aov[[1]][["Df"]][2]`) = `r rd(lG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(lG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(lG_eta[1],3)`
 
-#Personal Distress
+
+#Personal Distress by group
 ```{r personal distress, include=FALSE}
 #Comparing scores on self-reported personal distress
 
 pdAOV = aov(PDtotal ~ Group, data=d0)
-summary(pdAOV)
-etaSquared(pdAOV)
+  pdG_aov = summary(pdAOV)
+  pdG_eta = etaSquared(pdAOV)
 ```
+#####Personal Distress by group [pdG] 
+*F*(`r pdG_aov[[1]][["Df"]][1]`, `r pdG_aov[[1]][["Df"]][2]`) = `r rd(pdG_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(pdG_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(pdG_eta[1],3)`
 
 
 #Intervention self engagement by school
 ```{r intervention engagement self by school, include=FALSE}
 #assessing self-reported engagement during three intervention sessions (looking across schools)
 engageSelfSchoolAOV = aov(carefulYouSesAvg ~ School, data=d0)
-summary(engageSelfSchoolAOV)
-etaSquared(engageSelfSchoolAOV)
+  seS_aov = summary(engageSelfSchoolAOV)
+  seS_eta = etaSquared(engageSelfSchoolAOV)
 
 #comparisons 
 bartlett.test(carefulYouSesAvg~School, data = d0) #assume equal variance
 
 #School 1 and 2
-se_1_2_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="2"],var.equal = FALSE)
-se_1_2_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+seS_1_2_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="2"],var.equal = FALSE)
+seS_1_2_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 3
-se_1_3_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="3"],var.equal = FALSE)
-se_1_3_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+seS_1_3_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="3"],var.equal = FALSE)
+seS_1_3_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 4
-se_1_4_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = FALSE)
-se_1_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+seS_1_4_t = t.test(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = FALSE)
+seS_1_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="1"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 
 #School 2 and 3
-se_2_3_t = t.test(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="3"],var.equal = FALSE)
-se_2_3_d = cohen.d(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+seS_2_3_t = t.test(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="3"],var.equal = FALSE)
+seS_2_3_d = cohen.d(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 2 and 4
-se_2_4_t = t.test(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = FALSE)
-se_2_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+seS_2_4_t = t.test(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = FALSE)
+seS_2_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="2"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 
 #School 3 and 4
-se_3_4_t = t.test(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = FALSE)
-se_3_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+seS_3_4_t = t.test(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="4"],var.equal = FALSE)
+seS_3_4_d = cohen.d(d0$carefulYouSesAvg[d0$School=="3"],d0$carefulYouSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 ```
-#####Schools 2 and 4 self engagement [se_2_4]  
-*t*(`r rd(se_2_4_t$par,2)`) = `r rd(se_2_4_t$stat,2)`, *p* `r format_pval(se_2_4_t$p.value)`, 95% CI [`r rd(se_2_4_t$conf.int[1],2)`, `r rd(se_2_4_t$conf.int[2],2)`], *d* = `r rd(se_2_4_d$est,2)`
+#####Intervention self engagement by school [seS] 
+*F*(`r seS_aov[[1]][["Df"]][1]`, `r seS_aov[[1]][["Df"]][2]`) = `r rd(seS_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(seS_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(seS_eta[1],3)`
+
+#####Schools 2 and 4 self engagement [seS_2_4]  
+*t*(`r rd(seS_2_4_t$par,2)`) = `r rd(seS_2_4_t$stat,2)`, *p* `r format_pval(seS_2_4_t$p.value)`, 95% CI [`r rd(seS_2_4_t$conf.int[1],2)`, `r rd(seS_2_4_t$conf.int[2],2)`], *d* = `r rd(seS_2_4_d$est,2)`
 
 
 #Intervention peer engagement by school
 ```{r intervention engagement peers by school, include=FALSE}
 #assessing perceptions of peer engagement during three intervention sessions (looking across schools)
 engagePeersSchoolAOV = aov(carefulPeersSesAvg ~ School, data=d0)
-summary(engagePeersSchoolAOV)
-etaSquared(engagePeersSchoolAOV)
+  peS_aov = summary(engagePeersSchoolAOV)
+  peS_eta = etaSquared(engagePeersSchoolAOV)
 
 #comparisons 
 bartlett.test(carefulPeersSesAvg~School, data = d0) #can't assume equal variance
 
 
 #School 1 and 2
-pe_1_2_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="2"],var.equal = FALSE)
-pe_1_2_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+peS_1_2_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="2"],var.equal = FALSE)
+peS_1_2_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 3
-pe_1_3_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="3"],var.equal = FALSE)
-pe_1_3_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+peS_1_3_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="3"],var.equal = FALSE)
+peS_1_3_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 4
-pe_1_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = FALSE)
-pe_1_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+peS_1_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = FALSE)
+peS_1_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="1"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 
 #School 2 and 3
-pe_2_3_t = t.test(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="3"],var.equal = FALSE)
-pe_2_3_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+peS_2_3_t = t.test(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="3"],var.equal = FALSE)
+peS_2_3_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 2 and 4
-pe_2_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = FALSE)
-pe_2_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+peS_2_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = FALSE)
+peS_2_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="2"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 
 #School 3 and 4
-pe_3_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = FALSE)
-pe_3_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+peS_3_4_t = t.test(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="4"],var.equal = FALSE)
+peS_3_4_d = cohen.d(d0$carefulPeersSesAvg[d0$School=="3"],d0$carefulPeersSesAvg[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 ```
-#####Schools 2 and 4 [pe_2_4]  
-*t*(`r rd(pe_2_4_t$par,2)`) = `r rd(pe_2_4_t$stat,2)`, *p* `r format_pval(pe_2_4_t$p.value)`, 95% CI [`r rd(pe_2_4_t$conf.int[1],2)`, `r rd(pe_2_4_t$conf.int[2],2)`], *d* = `r rd(pe_2_4_d$est,2)`
+#####Intervention peer engagement by school [peS] 
+*F*(`r peS_aov[[1]][["Df"]][1]`, `r peS_aov[[1]][["Df"]][2]`) = `r rd(peS_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(peS_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(peS_eta[1],3)`
 
+#####Schools 2 and 4 [peS_2_4]  
+*t*(`r rd(peS_2_4_t$par,2)`) = `r rd(peS_2_4_t$stat,2)`, *p* `r format_pval(peS_2_4_t$p.value)`, 95% CI [`r rd(peS_2_4_t$conf.int[1],2)`, `r rd(peS_2_4_t$conf.int[2],2)`], *d* = `r rd(peS_2_4_d$est,2)`
 
 
 #Physical Agggression by school
 ```{r physical aggression by school, include=FALSE}
 physSchoolAOV = aov(CSBSphys ~ School, data=d0)
-summary(physSchoolAOV)
-etaSquared(physSchoolAOV)
+  paS_aov = summary(physSchoolAOV)
+  paS_eta = etaSquared(physSchoolAOV)
 
 #comparisons 
 bartlett.test(CSBSphys~School, data = d0) #can't assume equal variance
 
 
 #School 1 and 2
-pa_1_2_t = t.test(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="2"],var.equal = FALSE)
-pa_1_2_d = cohen.d(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+paS_1_2_t = t.test(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="2"],var.equal = FALSE)
+paS_1_2_d = cohen.d(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 3
-pa_1_3_t = t.test(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="3"],var.equal = FALSE)
-pa_1_3_d = cohen.d(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+paS_1_3_t = t.test(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="3"],var.equal = FALSE)
+paS_1_3_d = cohen.d(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 4
-pa_1_4_t = t.test(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="4"],var.equal = FALSE)
-pa_1_4_d = cohen.d(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+paS_1_4_t = t.test(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="4"],var.equal = FALSE)
+paS_1_4_d = cohen.d(d0$CSBSphys[d0$School=="1"],d0$CSBSphys[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 
 #School 2 and 3
-pa_2_3_t = t.test(d0$CSBSphys[d0$School=="2"],d0$CSBSphys[d0$School=="3"],var.equal = FALSE)
-pa_2_3_d = cohen.d(d0$CSBSphys[d0$School=="2"],d0$CSBSphys[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+paS_2_3_t = t.test(d0$CSBSphys[d0$School=="2"],d0$CSBSphys[d0$School=="3"],var.equal = FALSE)
+paS_2_3_d = cohen.d(d0$CSBSphys[d0$School=="2"],d0$CSBSphys[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 4 and 2
-pa_4_2_t = t.test(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="2"],var.equal = FALSE)
-pa_4_2_d = cohen.d(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+paS_4_2_t = t.test(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="2"],var.equal = FALSE)
+paS_4_2_d = cohen.d(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
 
 #School 4 and 3
-pa_4_3_t = t.test(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="3"],var.equal = FALSE)
-pa_4_3_d = cohen.d(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+paS_4_3_t = t.test(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="3"],var.equal = FALSE)
+paS_4_3_d = cohen.d(d0$CSBSphys[d0$School=="4"],d0$CSBSphys[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 ```
-#####Schools 1 and 2 [pa_1_2]  
-*t*(`r rd(pa_1_2_t$par,2)`) = `r rd(pa_1_2_t$stat,2)`, *p* `r format_pval(pa_1_2_t$p.value)`, 95% CI [`r rd(pa_1_2_t$conf.int[1],2)`, `r rd(pa_1_2_t$conf.int[2],2)`], *d* = `r rd(pa_1_2_d$est,2)`
+#####Physical Agggression by school [paS] 
+*F*(`r paS_aov[[1]][["Df"]][1]`, `r paS_aov[[1]][["Df"]][2]`) = `r rd(paS_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(paS_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(paS_eta[1],3)`
 
-#####Schools 1 and 3 [pa_1_3]  
-*t*(`r rd(pa_1_3_t$par,2)`) = `r rd(pa_1_3_t$stat,2)`, *p* `r format_pval(pa_1_3_t$p.value)`, 95% CI [`r rd(pa_1_3_t$conf.int[1],2)`, `r rd(pa_1_3_t$conf.int[2],2)`], *d* = `r rd(pa_1_3_d$est,2)`
+#####Schools 1 and 2 [paS_1_2]  
+*t*(`r rd(paS_1_2_t$par,2)`) = `r rd(paS_1_2_t$stat,2)`, *p* `r format_pval(paS_1_2_t$p.value)`, 95% CI [`r rd(paS_1_2_t$conf.int[1],2)`, `r rd(paS_1_2_t$conf.int[2],2)`], *d* = `r rd(paS_1_2_d$est,2)`
 
-#####Schools 1 and 4 [pa_1_4]  
-*t*(`r rd(pa_1_4_t$par,2)`) = `r rd(pa_1_4_t$stat,2)`, *p* `r format_pval(pa_1_4_t$p.value)`, 95% CI [`r rd(pa_1_4_t$conf.int[1],2)`, `r rd(pa_1_4_t$conf.int[2],2)`], *d* = `r rd(pa_1_4_d$est,2)`
+#####Schools 1 and 3 [paS_1_3]  
+*t*(`r rd(paS_1_3_t$par,2)`) = `r rd(paS_1_3_t$stat,2)`, *p* `r format_pval(paS_1_3_t$p.value)`, 95% CI [`r rd(paS_1_3_t$conf.int[1],2)`, `r rd(paS_1_3_t$conf.int[2],2)`], *d* = `r rd(paS_1_3_d$est,2)`
 
-#####Schools 4 and 2 [pa_4_2]  
-*t*(`r rd(pa_4_2_t$par,2)`) = `r rd(pa_4_2_t$stat,2)`, *p* `r format_pval(pa_4_2_t$p.value)`, 95% CI [`r rd(pa_4_2_t$conf.int[1],2)`, `r rd(pa_4_2_t$conf.int[2],2)`], *d* = `r rd(pa_4_2_d$est,2)`
+#####Schools 1 and 4 [paS_1_4]  
+*t*(`r rd(paS_1_4_t$par,2)`) = `r rd(paS_1_4_t$stat,2)`, *p* `r format_pval(paS_1_4_t$p.value)`, 95% CI [`r rd(paS_1_4_t$conf.int[1],2)`, `r rd(paS_1_4_t$conf.int[2],2)`], *d* = `r rd(paS_1_4_d$est,2)`
 
-#####Schools 4 and 3 [pa_4_3]  
-*t*(`r rd(pa_4_3_t$par,2)`) = `r rd(pa_4_3_t$stat,2)`, *p* `r format_pval(pa_4_3_t$p.value)`, 95% CI [`r rd(pa_4_3_t$conf.int[1],2)`, `r rd(pa_4_3_t$conf.int[2],2)`], *d* = `r rd(pa_4_3_d$est,2)`
+#####Schools 4 and 2 [paS_4_2]  
+*t*(`r rd(paS_4_2_t$par,2)`) = `r rd(paS_4_2_t$stat,2)`, *p* `r format_pval(paS_4_2_t$p.value)`, 95% CI [`r rd(paS_4_2_t$conf.int[1],2)`, `r rd(paS_4_2_t$conf.int[2],2)`], *d* = `r rd(paS_4_2_d$est,2)`
+
+#####Schools 4 and 3 [paS_4_3]  
+*t*(`r rd(paS_4_3_t$par,2)`) = `r rd(paS_4_3_t$stat,2)`, *p* `r format_pval(paS_4_3_t$p.value)`, 95% CI [`r rd(paS_4_3_t$conf.int[1],2)`, `r rd(paS_4_3_t$conf.int[2],2)`], *d* = `r rd(paS_4_3_d$est,2)`
 
 
 #Relational Agggression by school
 ```{r relational aggression by school, include=FALSE}
 relatSchoolAOV = aov(CSBSrelat ~ School, data=d0)
-summary(relatSchoolAOV)
-etaSquared(relatSchoolAOV)
+  raS_aov = summary(relatSchoolAOV)
+  raS_eta = etaSquared(relatSchoolAOV)
 
 #comparisons 
 bartlett.test(CSBSrelat~School, data = d0) #can't assume equal variance
 
 
 #School 1 and 2
-ra_1_2_t = t.test(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="2"],var.equal = FALSE)
-ra_1_2_d = cohen.d(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+raS_1_2_t = t.test(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="2"],var.equal = FALSE)
+raS_1_2_d = cohen.d(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 3
-ra_1_3_t = t.test(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="3"],var.equal = FALSE)
-ra_1_3_d = cohen.d(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+raS_1_3_t = t.test(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="3"],var.equal = FALSE)
+raS_1_3_d = cohen.d(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 4
-ra_1_4_t = t.test(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="4"],var.equal = FALSE)
-ra_1_4_d = cohen.d(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+raS_1_4_t = t.test(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="4"],var.equal = FALSE)
+raS_1_4_d = cohen.d(d0$CSBSrelat[d0$School=="1"],d0$CSBSrelat[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 
 #School 2 and 3
-ra_2_3_t = t.test(d0$CSBSrelat[d0$School=="2"],d0$CSBSrelat[d0$School=="3"],var.equal = FALSE)
-ra_2_3_d = cohen.d(d0$CSBSrelat[d0$School=="2"],d0$CSBSrelat[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+raS_2_3_t = t.test(d0$CSBSrelat[d0$School=="2"],d0$CSBSrelat[d0$School=="3"],var.equal = FALSE)
+raS_2_3_d = cohen.d(d0$CSBSrelat[d0$School=="2"],d0$CSBSrelat[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 4 and 2
-ra_4_2_t = t.test(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="2"],var.equal = FALSE)
-ra_4_2_d = cohen.d(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+raS_4_2_t = t.test(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="2"],var.equal = FALSE)
+raS_4_2_d = cohen.d(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
 
 #School 4 and 3
-ra_4_3_t = t.test(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="3"],var.equal = FALSE)
-ra_4_3_d = cohen.d(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+raS_4_3_t = t.test(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="3"],var.equal = FALSE)
+raS_4_3_d = cohen.d(d0$CSBSrelat[d0$School=="4"],d0$CSBSrelat[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 ```
-#####Schools 1 and 2 [ra_1_2]  
-*t*(`r rd(ra_1_2_t$par,2)`) = `r rd(ra_1_2_t$stat,2)`, *p* `r format_pval(ra_1_2_t$p.value)`, 95% CI [`r rd(ra_1_2_t$conf.int[1],2)`, `r rd(ra_1_2_t$conf.int[2],2)`], *d* = `r rd(ra_1_2_d$est,2)`
+#####Relational Agggression by school [raS] 
+*F*(`r raS_aov[[1]][["Df"]][1]`, `r raS_aov[[1]][["Df"]][2]`) = `r rd(raS_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(raS_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(raS_eta[1],3)`
 
-#####Schools 1 and 3 [ra_1_3]  
-*t*(`r rd(ra_1_3_t$par,2)`) = `r rd(ra_1_3_t$stat,2)`, *p* `r format_pval(ra_1_3_t$p.value)`, 95% CI [`r rd(ra_1_3_t$conf.int[1],2)`, `r rd(ra_1_3_t$conf.int[2],2)`], *d* = `r rd(ra_1_3_d$est,2)`
+#####Schools 1 and 2 [raS_1_2]  
+*t*(`r rd(raS_1_2_t$par,2)`) = `r rd(raS_1_2_t$stat,2)`, *p* `r format_pval(raS_1_2_t$p.value)`, 95% CI [`r rd(raS_1_2_t$conf.int[1],2)`, `r rd(raS_1_2_t$conf.int[2],2)`], *d* = `r rd(raS_1_2_d$est,2)`
 
-#####Schools 1 and 4 [ra_1_4]  
-*t*(`r rd(ra_1_4_t$par,2)`) = `r rd(ra_1_4_t$stat,2)`, *p* `r format_pval(ra_1_4_t$p.value)`, 95% CI [`r rd(ra_1_4_t$conf.int[1],2)`, `r rd(ra_1_4_t$conf.int[2],2)`], *d* = `r rd(ra_1_4_d$est,2)`
+#####Schools 1 and 3 [raS_1_3]  
+*t*(`r rd(raS_1_3_t$par,2)`) = `r rd(raS_1_3_t$stat,2)`, *p* `r format_pval(raS_1_3_t$p.value)`, 95% CI [`r rd(raS_1_3_t$conf.int[1],2)`, `r rd(raS_1_3_t$conf.int[2],2)`], *d* = `r rd(raS_1_3_d$est,2)`
 
-#####Schools 4 and 2 [ra_4_2]  
-*t*(`r rd(ra_4_2_t$par,2)`) = `r rd(ra_4_2_t$stat,2)`, *p* `r format_pval(ra_4_2_t$p.value)`, 95% CI [`r rd(ra_4_2_t$conf.int[1],2)`, `r rd(ra_4_2_t$conf.int[2],2)`], *d* = `r rd(ra_4_2_d$est,2)`
+#####Schools 1 and 4 [raS_1_4]  
+*t*(`r rd(raS_1_4_t$par,2)`) = `r rd(raS_1_4_t$stat,2)`, *p* `r format_pval(raS_1_4_t$p.value)`, 95% CI [`r rd(raS_1_4_t$conf.int[1],2)`, `r rd(raS_1_4_t$conf.int[2],2)`], *d* = `r rd(raS_1_4_d$est,2)`
 
-#####Schools 4 and 2 [ra_4_2]  
-*t*(`r rd(ra_4_3_t$par,2)`) = `r rd(ra_4_3_t$stat,2)`, *p* `r format_pval(ra_4_3_t$p.value)`, 95% CI [`r rd(ra_4_3_t$conf.int[1],2)`, `r rd(ra_4_3_t$conf.int[2],2)`], *d* = `r rd(ra_4_3_d$est,2)`
+#####Schools 4 and 2 [raS_4_2]  
+*t*(`r rd(raS_4_2_t$par,2)`) = `r rd(raS_4_2_t$stat,2)`, *p* `r format_pval(raS_4_2_t$p.value)`, 95% CI [`r rd(raS_4_2_t$conf.int[1],2)`, `r rd(raS_4_2_t$conf.int[2],2)`], *d* = `r rd(raS_4_2_d$est,2)`
 
-
-
-
+#####Schools 4 and 3 [raS_4_3]  
+*t*(`r rd(raS_4_3_t$par,2)`) = `r rd(raS_4_3_t$stat,2)`, *p* `r format_pval(raS_4_3_t$p.value)`, 95% CI [`r rd(raS_4_3_t$conf.int[1],2)`, `r rd(raS_4_3_t$conf.int[2],2)`], *d* = `r rd(raS_4_3_d$est,2)`
 
 
 #Self-reported prosocial behavior by school
 ```{r prosocial behavior by school, include=FALSE}
 
 prosocialSchoolAOV = aov(CSBSprosocial ~ School, data=d0)
-summary(prosocialSchoolAOV)
-etaSquared(prosocialSchoolAOV)
+  proS_aov = summary(prosocialSchoolAOV)
+  proS_eta = etaSquared(prosocialSchoolAOV)
 
 #comparisons 
 bartlett.test(CSBSprosocial~School, data = d0) #can't assume equal variance
 
 
 #School 1 and 2
-pro_1_2_t = t.test(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="2"],var.equal = FALSE)
-pro_1_2_d = cohen.d(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+proS_1_2_t = t.test(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="2"],var.equal = FALSE)
+proS_1_2_d = cohen.d(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 3
-pro_1_3_t = t.test(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="3"],var.equal = FALSE)
-pro_1_3_d = cohen.d(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+proS_1_3_t = t.test(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="3"],var.equal = FALSE)
+proS_1_3_d = cohen.d(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 4
-pro_1_4_t = t.test(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="4"],var.equal = FALSE)
-pro_1_4_d = cohen.d(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+proS_1_4_t = t.test(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="4"],var.equal = FALSE)
+proS_1_4_d = cohen.d(d0$CSBSprosocial[d0$School=="1"],d0$CSBSprosocial[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 
 #School 2 and 3
-pro_2_3_t = t.test(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="3"],var.equal = FALSE)
-pro_2_3_d = cohen.d(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+proS_2_3_t = t.test(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="3"],var.equal = FALSE)
+proS_2_3_d = cohen.d(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 2 and 4
-pro_2_4_t = t.test(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="4"],var.equal = FALSE)
-pro_2_4_d = cohen.d(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+proS_2_4_t = t.test(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="4"],var.equal = FALSE)
+proS_2_4_d = cohen.d(d0$CSBSprosocial[d0$School=="2"],d0$CSBSprosocial[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 
 #School 3 and 4
-pro_3_4_t = t.test(d0$CSBSprosocial[d0$School=="3"],d0$CSBSprosocial[d0$School=="4"],var.equal = FALSE)
-pro_3_4_d = cohen.d(d0$CSBSprosocial[d0$School=="3"],d0$CSBSprosocial[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+proS_3_4_t = t.test(d0$CSBSprosocial[d0$School=="3"],d0$CSBSprosocial[d0$School=="4"],var.equal = FALSE)
+proS_3_4_d = cohen.d(d0$CSBSprosocial[d0$School=="3"],d0$CSBSprosocial[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 ```
 
-#####Schools 1 and 3 [pro_1_3]  
-*t*(`r rd(pro_1_3_t$par,2)`) = `r rd(pro_1_3_t$stat,2)`, *p* `r format_pval(pro_1_3_t$p.value)`, 95% CI [`r rd(pro_1_3_t$conf.int[1],2)`, `r rd(pro_1_3_t$conf.int[2],2)`], *d* = `r rd(pro_1_3_d$est,2)`
+#####Self-reported prosocial behavior by school [proS] 
+*F*(`r proS_aov[[1]][["Df"]][1]`, `r proS_aov[[1]][["Df"]][2]`) = `r rd(proS_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(proS_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(proS_eta[1],3)`
 
-#####Schools 1 and 4 [pro_1_4]  
-*t*(`r rd(pro_1_4_t$par,2)`) = `r rd(pro_1_4_t$stat,2)`, *p* `r format_pval(pro_1_4_t$p.value)`, 95% CI [`r rd(pro_1_4_t$conf.int[1],2)`, `r rd(pro_1_4_t$conf.int[2],2)`], *d* = `r rd(pro_1_4_d$est,2)`
+#####Schools 1 and 3 [proS_1_3]  
+*t*(`r rd(proS_1_3_t$par,2)`) = `r rd(proS_1_3_t$stat,2)`, *p* `r format_pval(proS_1_3_t$p.value)`, 95% CI [`r rd(proS_1_3_t$conf.int[1],2)`, `r rd(proS_1_3_t$conf.int[2],2)`], *d* = `r rd(proS_1_3_d$est,2)`
 
-#####Schools 2 and 3 [pro_2_3]  
-*t*(`r rd(pro_2_3_t$par,2)`) = `r rd(pro_2_3_t$stat,2)`, *p* `r format_pval(pro_2_3_t$p.value)`, 95% CI [`r rd(pro_2_3_t$conf.int[1],2)`, `r rd(pro_2_3_t$conf.int[2],2)`], *d* = `r rd(pro_2_3_d$est,2)`
+#####Schools 1 and 4 [proS_1_4]  
+*t*(`r rd(proS_1_4_t$par,2)`) = `r rd(proS_1_4_t$stat,2)`, *p* `r format_pval(proS_1_4_t$p.value)`, 95% CI [`r rd(proS_1_4_t$conf.int[1],2)`, `r rd(proS_1_4_t$conf.int[2],2)`], *d* = `r rd(proS_1_4_d$est,2)`
 
-#####Schools 1 and 2 [pro_1_2]  
-*t*(`r rd(pro_1_2_t$par,2)`) = `r rd(pro_1_2_t$stat,2)`, *p* `r format_pval(pro_1_2_t$p.value)`, 95% CI [`r rd(pro_1_2_t$conf.int[1],2)`, `r rd(pro_1_2_t$conf.int[2],2)`], *d* = `r rd(pro_1_2_d$est,2)`
+#####Schools 2 and 3 [proS_2_3]  
+*t*(`r rd(proS_2_3_t$par,2)`) = `r rd(proS_2_3_t$stat,2)`, *p* `r format_pval(proS_2_3_t$p.value)`, 95% CI [`r rd(proS_2_3_t$conf.int[1],2)`, `r rd(proS_2_3_t$conf.int[2],2)`], *d* = `r rd(proS_2_3_d$est,2)`
 
-#####Schools 2 and 4 [pro_2_4]  
-*t*(`r rd(pro_2_4_t$par,2)`) = `r rd(pro_2_4_t$stat,2)`, *p* `r format_pval(pro_2_4_t$p.value)`, 95% CI [`r rd(pro_2_4_t$conf.int[1],2)`, `r rd(pro_2_4_t$conf.int[2],2)`], *d* = `r rd(pro_2_4_d$est,2)`
+#####Schools 1 and 2 [proS_1_2]  
+*t*(`r rd(proS_1_2_t$par,2)`) = `r rd(proS_1_2_t$stat,2)`, *p* `r format_pval(proS_1_2_t$p.value)`, 95% CI [`r rd(proS_1_2_t$conf.int[1],2)`, `r rd(proS_1_2_t$conf.int[2],2)`], *d* = `r rd(proS_1_2_d$est,2)`
 
-#####Schools 3 and 4 [pro_3_4]  
-*t*(`r rd(pro_3_4_t$par,2)`) = `r rd(pro_3_4_t$stat,2)`, *p* `r format_pval(pro_3_4_t$p.value)`, 95% CI [`r rd(pro_3_4_t$conf.int[1],2)`, `r rd(pro_3_4_t$conf.int[2],2)`], *d* = `r rd(pro_3_4_d$est,2)`
+#####Schools 2 and 4 [proS_2_4]  
+*t*(`r rd(proS_2_4_t$par,2)`) = `r rd(proS_2_4_t$stat,2)`, *p* `r format_pval(proS_2_4_t$p.value)`, 95% CI [`r rd(proS_2_4_t$conf.int[1],2)`, `r rd(proS_2_4_t$conf.int[2],2)`], *d* = `r rd(proS_2_4_d$est,2)`
 
-
+#####Schools 3 and 4 [proS_3_4]  
+*t*(`r rd(proS_3_4_t$par,2)`) = `r rd(proS_3_4_t$stat,2)`, *p* `r format_pval(proS_3_4_t$p.value)`, 95% CI [`r rd(proS_3_4_t$conf.int[1],2)`, `r rd(proS_3_4_t$conf.int[2],2)`], *d* = `r rd(proS_3_4_d$est,2)`
 
 
 
 #Creating Figure 1 (empathic motivation)
 
-```{Make figure 1, include=FALSE}
+```{Make figure 1, include=FALSE, eval = FALSE, echo = FALSE}
 cbPalette = c("#512857","#4254AE", "#1DA29B") #color palette 
 
 #Empathic Motives
@@ -644,7 +682,7 @@ ggsave("~/Dropbox/middleSchoolManuscript/Current/Fig1.jpg", width = 3.5, height 
 
 
 #Creating Figure 2 (Engagement scores by school)
-```{r Making figure 2, include=FALSE}
+```{r Making figure 2, include=FALSE, eval = FALSE, echo = FALSE}
 engageSelf_School = d0 %>%
   group_by(School) %>%
   summarise(mean=mean(carefulYouSesAvg, na.rm = T), sd=sd(carefulYouSesAvg,na.rm=T), n = sum(!is.na(carefulYouSesAvg)), se = sd/sqrt(n))
@@ -698,7 +736,7 @@ ggsave("~/Dropbox/middleSchoolManuscript/Current/Fig2.jpg", width = 6.5, height 
 
 
 #Creating figure 3, physical and relational aggression by school
-```{r Making figure 3, include=FALSE}
+```{r Making figure 3, include=FALSE, eval = FALSE, echo = FALSE}
 phys_School = d0 %>%
   group_by(School) %>%
   summarise(mean=mean(CSBSphys, na.rm = T), sd=sd(CSBSphys,na.rm=T), n = sum(!is.na(CSBSphys)), se = sd/sqrt(n))
@@ -751,8 +789,9 @@ ggarrange(phys_Plot, relat_Plot, labels = c("A)","B)"), ncol = 2)
 ggsave("~/Dropbox/middleSchoolManuscript/Current/Fig3.jpg", width = 6.5, height = 3, dpi = 300)
 ```
 
+
 #Creating Figure 4 (Empathic motives and normativity beliefs by school and group)
-```{r Making figure 4, include=FALSE}
+```{r Making figure 4, include=FALSE, eval = FALSE, echo = FALSE}
 cbPalette = c("#512857","#4254AE", "#1DA29B") #color palette 
 
 Empathic_Motives_School_Group = d0 %>%
@@ -814,11 +853,11 @@ ggsave("~/Dropbox/middleSchoolManuscript/Current/Fig4.jpg", width = 6.5, height 
 ```
 
 
-#SUPPLEMENT: Skepticism about empathy
+#SUPPLEMENT: Skepticism about empathy by school
 ```{r supplement skepticism about empathy for , include=FALSE}
 empNotGoodSchoolAOV = aov(empNotGood ~ School, data=d0)
-summary(empNotGoodSchoolAOV)
-etaSquared(empNotGoodSchoolAOV)
+  skS_aov = summary(empNotGoodSchoolAOV)
+  skS_eta = etaSquared(empNotGoodSchoolAOV)
 
 
 #comparisons 
@@ -826,24 +865,26 @@ bartlett.test(empNotGood~School, data = d0) #can't assume equal variance
 
 
 #School 1 and 2
-t.test(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="2"],var.equal = FALSE)
-cohen.d(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
+skS_1_2_t = t.test(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="2"],var.equal = FALSE)
+skS_1_2_d = cohen.d(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="2"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 3
-t.test(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="3"],var.equal = FALSE)
-cohen.d(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+skS_1_3_t = t.test(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="3"],var.equal = FALSE)
+skS_1_3_d = cohen.d(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 1 and 4
-t.test(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="4"],var.equal = FALSE)
-cohen.d(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+skS_1_4_t = t.test(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="4"],var.equal = FALSE)
+skS_1_4_d = cohen.d(d0$empNotGood[d0$School=="1"],d0$empNotGood[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
 
 #School 2 and 3
-t.test(d0$empNotGood[d0$School=="2"],d0$empNotGood[d0$School=="3"],var.equal = FALSE)
-cohen.d(d0$empNotGood[d0$School=="2"],d0$empNotGood[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
+skS_2_3_t = t.test(d0$empNotGood[d0$School=="2"],d0$empNotGood[d0$School=="3"],var.equal = FALSE)
+skS_2_3_d = cohen.d(d0$empNotGood[d0$School=="2"],d0$empNotGood[d0$School=="3"],return.dm=TRUE, na.rm=TRUE)
 
 #School 3 and 4
-t.test(d0$empNotGood[d0$School=="3"],d0$empNotGood[d0$School=="4"],var.equal = FALSE)
-cohen.d(d0$empNotGood[d0$School=="3"],d0$empNotGood[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+skS_3_4_t = t.test(d0$empNotGood[d0$School=="3"],d0$empNotGood[d0$School=="4"],var.equal = FALSE)
+skS_3_4_d = cohen.d(d0$empNotGood[d0$School=="3"],d0$empNotGood[d0$School=="4"],return.dm=TRUE, na.rm=TRUE)
+
+
 
 empNotGood_School = d0 %>%
   group_by(School) %>%
@@ -883,9 +924,28 @@ addmargins(table(d0$Group[which(is.na(d0$MalTotal))])) #Malleability beliefs
 addmargins(table(d0$Group[which(is.na(d0$NormsTotal))])) #Norms beliefs
 ```
 
+#####Skepticism about empathy by school [skS] 
+*F*(`r skS_aov[[1]][["Df"]][1]`, `r skS_aov[[1]][["Df"]][2]`) = `r rd(skS_aov[[1]][["F value"]][1],2)`, *p* `r format_pval(skS_aov[[1]][["Pr(>F)"]][1])`, $\eta$^2^  = `r rd(skS_eta[1],3)`
+
+#####Schools 1 and 2 [skS_1_2]  
+*t*(`r rd(skS_1_2_t$par,2)`) = `r rd(skS_1_2_t$stat,2)`, *p* `r format_pval(skS_1_2_t$p.value)`, 95% CI [`r rd(skS_1_2_t$conf.int[1],2)`, `r rd(skS_1_2_t$conf.int[2],2)`], *d* = `r rd(skS_1_2_d$est,2)`
+
+#####Schools 1 and 3 [skS_1_3]  
+*t*(`r rd(skS_1_3_t$par,2)`) = `r rd(skS_1_3_t$stat,2)`, *p* `r format_pval(skS_1_3_t$p.value)`, 95% CI [`r rd(skS_1_3_t$conf.int[1],2)`, `r rd(skS_1_3_t$conf.int[2],2)`], *d* = `r rd(skS_1_3_d$est,2)`
+
+#####Schools 1 and 4 [skS_1_4]  
+*t*(`r rd(skS_1_4_t$par,2)`) = `r rd(skS_1_4_t$stat,2)`, *p* `r format_pval(skS_1_4_t$p.value)`, 95% CI [`r rd(skS_1_4_t$conf.int[1],2)`, `r rd(skS_1_4_t$conf.int[2],2)`], *d* = `r rd(skS_1_4_d$est,2)`
+
+#####Schools 2 and 3 [skS_2_3]  
+*t*(`r rd(skS_2_3_t$par,2)`) = `r rd(skS_2_3_t$stat,2)`, *p* `r format_pval(skS_2_3_t$p.value)`, 95% CI [`r rd(skS_2_3_t$conf.int[1],2)`, `r rd(skS_2_3_t$conf.int[2],2)`], *d* = `r rd(skS_2_3_d$est,2)`
+
+#####Schools 2 and 4 [skS_3_4]  
+*t*(`r rd(skS_3_4_t$par,2)`) = `r rd(skS_3_4_t$stat,2)`, *p* `r format_pval(skS_3_4_t$p.value)`, 95% CI [`r rd(skS_3_4_t$conf.int[1],2)`, `r rd(skS_3_4_t$conf.int[2],2)`], *d* = `r rd(skS_3_4_d$est,2)`
+
+
 #SUPPLEMENT: SNI vs MMI and CI
 
-```{r coding for SNI vs other two conditions, supplemental analysis}
+```{r coding for SNI vs other two conditions, supplemental analysis, eval = FALSE, echo = FALSE}
 d0$normsIntervention = NA
 d0$normsIntervention[d0$Group == c("SNI")] = 1
 d0$normsIntervention[d0$Group == c("MMI")] = 0
@@ -926,7 +986,7 @@ boot.fit
 
 #SUPPLEMENT: Indirect effect with all four schools
 
-```{r including all four schools in SEM, supplemental analysis}
+```{r including all four schools in SEM, supplemental analysis, eval = FALSE, echo = FALSE}
 d0_SNI_CI = subset(d0,Group != "MMI") #remove malleable so as to compare social norms to control condition
 d0_SNI_CI$Group <- factor(d0_SNI_CI$Group, levels = c("CI","SNI")) 
 contrasts(d0_SNI_CI$Group)
